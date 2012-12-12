@@ -1,0 +1,15 @@
+*.o
+*.dSYM
+geticon/geticon
+seticon/seticon
+wsupdate/wsupdate
+fileinfo/fileinfo
+getfcomment/getfcomment
+hfsdata/hfsdata
+lsmac/lsmac
+mkalias/mkalias
+setfcomment/setfcomment
+setfctypes/setfctypes
+setfflags/setfflags
+setlabel/setlabel
+setsuffix/setsuffix
