@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+print "This is an verview of the 'osxutils' suite of Mac command line utilities.    The programs included in the suite are listed in alphabetical order, followed by a short description of their function.  For more detail on the functionality of individual tools, see the program man pages.\n\n";
+
+print "cpath -- copies current working directory to the clipboard\n";
+print "getfcomment -- print out the Mac OS comment of a given file\n";
+print "geticon -- extract the icon of a file as an image\n";
+print "google -- search Google for arguments in your default browser\n";
+print "hfsdata -- get various HFS- or Mac-specific meta-data for a file\n";
+print "lsmac -- get directory listing with Mac meta-data listed\n";
+print "mkalias -- create Mac OS Finder aliases\n";
+print "rcmac -- recursively descend into directories and list files like lsmac\n";
+print "setfcomment -- set the Mac OS comment of a file\n";
+print "setfctypes -- set heritage Mac OS File Type or Creator of a file\n";
+print "setfflags -- set the Finder flags of a file\n";
+print "seticon -- set the Mac OS Icon of a file\n";
+print "setlabel -- set the Mac OS Finder Label of a file\n";
+print "setsuffix -- batch modify file suffices\n";
+print "setvolume -- alter global Mac system volume\n";
+print "trash -- move a given file to the Trash\n";
+print "wiki -- search Wikipedia for some words via default browser\n";
+print "wsupdate -- update the Finder filesystem display\n";
+print "\n";

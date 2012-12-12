@@ -1,0 +1,82 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.Dd Thu May 27 2004               \" DATE 
+.Dt seticon 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm seticon
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd Set icon of Mac OS X files.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhd              \" [-abcd]
+.Op Ar source              \" [file]
+.Op Ar                   \" [file ...]
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm 
+is a utility for setting a custom icon on Mac OS X files and folders via the command line.
+The first argument to seticon is the source file, i.e. the file with the icon you wish to
+apply to other file(s).  Any arguments after the first should be
+files which you wish to give the custom icon to.
+.Pp
+Please note that this need not be an .icns file -- see the -d option for using
+an .icns file as a source.
+.Nm
+defaults to retrieving the actual icon of the file in question.  
+.Pp                      \" Inserts a space
+Typical usage would look like this:
+.Pp                      \" Inserts a space
+.Nm
+sourcefile file1 file2
+.Pp                      \" Inserts a space
+The example above would result in the icon of
+.Ar sourcefile
+being applied to the files
+.Ar file1 
+and
+.Ar file2 
+as custom icons.
+.Pp                      \" Inserts a space
+.Nm 
+supports the following options:
+.Bl -tag -width -indent  \" Differs from above in tag removed 
+.It Fl d                 \"-a flag as a list item
+Use the data of the source file as icon instead of the source file's actual icon.
+.It Fl v                 \"-a flag as a list item
+Print version and author
+.It Fl h
+Print a short help text on program usage
+.El                      \" Ends the list
+.Pp
+.\" .Sh ENVIRONMENT      \" May not be needed
+.\" .Bl -tag -width "ENV_VAR_1" -indent \" ENV_VAR_1 is width of the string ENV_VAR_1
+.\" .It Ev ENV_VAR_1
+.\" Description of ENV_VAR_1
+.\" .It Ev ENV_VAR_2
+.\" Description of ENV_VAR_2
+.\" .El                      
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/seticon" -compact
+.It Pa /usr/local/bin/seticon
+.\" .Sh DIAGNOSTICS       \" May not be needed
+.\" .Bl -diag
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr geticon 1 , 
+.Xr lsmac 1 ,
+.Xr fileinfo 1 ,
+.Xr setfflags 1 ,
+.Xr setlabel 1 ,
+.Xr SetFile 1 ,
+.\" .Sh BUGS              \" Document known, unremedied bugs 
+.\" .Sh HISTORY           \" Document history if command behaves in a unique manner 
+

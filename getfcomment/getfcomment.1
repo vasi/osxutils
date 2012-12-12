@@ -1,0 +1,39 @@
+.Dd 11/27/05               \" DATE 
+.Dt getfcomment 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm getfcomment
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd Print Mac OS comment for file
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhpc              \" [-abcd]
+.Ar file ...              \" [file]
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm
+is a command line program which prints out the Mac OS comment on a file passed
+as an argument.
+.Pp
+.Nm
+supports the following flags:
+.Bl -tag -width -indent  \" Differs from above in tag removed 
+.It Fl p                 \"-a flag as a list item
+Name of file will be printed before each comment
+.It Fl c
+Output Mac OS Classic Desktop Database comment instead of Mac OS X Finder comment
+.It Fl v
+Print version and exit
+.It Fl h
+Print help and exit
+.El                      \" Ends the list
+.Pp
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/getfcomment" -compact
+.It Pa /usr/local/bin/getfcomment
+.El                      \" Ends the list
+
+.\" .El
+.Sh SEE ALSO 
+.Xr geticon 1 , 
+.Xr fileinfo 1 ,
+.Xr hfsdata 1

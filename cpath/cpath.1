@@ -1,0 +1,35 @@
+.Dd Tue Apr 01 2003
+.Dt cpath 1
+.Os Darwin
+.Sh NAME
+.Nm cpath
+.Nd Copies current working directory path to the MacOS clipboard
+.Sh SYNOPSIS             
+.Nm
+.Op Fl vh              
+.Sh DESCRIPTION
+cpath will copy the path returned by the getcwd() function into the MacOS clipboard.  It
+is more convenient than:
+.Pp  
+# pwd | pbcopy
+.Pp
+because it doesn't copy any newline character, which means you can paste the copied
+path into a terminal application without trying to execute it.
+.Bl -tag -width indent  
+.It Fl v                 
+Prints version and author.
+.It Fl h                 
+Prints help/usage.
+.El                     
+.Sh FILES               
+.Bl -tag -width "/usr/local/bin/cpath" -compact
+.It Pa /usr/local/bin/cpath
+.El
+.Sh SEE ALSO 
+.Xr lsmac 1 ,
+.Xr setfctypes 1 ,
+.Xr setfflags 1 ,
+.Xr mkalias 1 ,
+.Xr setsuffix 1 ,
+.Xr SetFile 1 ,
+.Xr setfcomment 1 

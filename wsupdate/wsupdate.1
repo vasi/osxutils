@@ -1,0 +1,21 @@
+.Dd Wed Mar 31 2003               \" DATE 
+.Dt wsupdate 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm wsupdate
+.Nd report file system change to Mac OS X
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Ar [-vh]
+.Ar file ...
+
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Ar wsupdate
+is a simple command line tool to execute the NSWorkspace method 'noteFileSystemChanged'.  This will make the Finder update its open windows.  If no arguments are given, the system will receive a general notification.  If files are specified, these particular locations will be updated.
+.Pp
+.Pp
+Please direct queries to Sveinbjorn Thordarson <sveinbt@hi.is>.
+.Pp                
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/wsupdate" -compact
+.It Pa /usr/local/bin/wsupdate

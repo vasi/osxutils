@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Uses find command to list every file using 'lsmac'
+#
+#
+
+find "$1" -type d -exec \/usr/local/bin/lsmac -o '{}' \;

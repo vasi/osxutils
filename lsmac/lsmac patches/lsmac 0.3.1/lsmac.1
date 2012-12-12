@@ -1,0 +1,102 @@
+.Dd Wed Mar 31 2003               \" DATE 
+.Dt lsmac 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm lsmac
+.\" The following lines are read in generating the apropos(man -k) database. Use only key
+.\" words here as the database is built based on the words here and in the .ND line. 
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd list directory contents and Mac meta-data associated with them.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhsboapl              \" [-vhsboapl]
+.Ar directory            \" Underlined argument - use .Ar anywhere to underline
+
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Ar lsmac
+is an ls-like utility for listing the files contained given directory on a HFS or HFS+ volume and the MacOS
+meta-data associated with them.  The output is akin to that of the ls long view.  Each line follows the format below:
+.Bl -tag -width -indent  \" Begins a tagged list 
+.It [Finder flags] [file type] [creator type] [size] [name or path]
+.El                      \" Ends the list
+.Pp
+By default, 
+.Ar lsmac 
+does not display file size and only lists the file name.  In the case of directories, only the name or 
+path is listed.
+.Pp
+The Finder flags of each file are displayed as a sequence of six characters.  Each character indicates whether one 
+of the following flags are set:
+.Bl -tag -width -indent  \" Begins a tagged list
+.It I
+File has the Invisible flag set
+.It C
+File has the Custom Icon flag set
+.It L
+File is Name Locked (i.e. it is a system file)
+.It B
+File has the Bundle bit flag set
+.It A
+File has the Alias flag set
+.It S
+File has the Stationery flag set
+.El      
+.Pp
+An '-' indicates that a flag is not set.  For example, a file with none of the Finder flags set would be listed as '------' while
+a file with all the flags set would be listed as 'ICLBAS'.
+.Pp
+.Ar lsmac
+accepts the following options:
+.Pp
+.Bl -tag -width indent  \" Differs from above in tag removed 
+.It Fl v                 \"-a flag as a list item
+Prints version and author and then exits
+.It Fl h
+Prints help
+.It Fl f[fork]
+Specify which forks to count when calculating file size.  You can specify fork as 'rsrc', 'data' or 'both' (minus quote marks).
+.It Fl b
+Display file size in bytes (i.e. 12977128 bytes)
+.It Fl o
+Omit folders when listing directory contents
+.It Fl F
+Only list folders when listing directory contents
+.It Fl a
+Display all files, including files with the . prefix.
+.It Fl p
+Display full file paths instead of file names
+.It Fl Q
+Display file name or path within quotation marks (").
+.It Fl l
+When listing file size, use physical size instead of logical size.
+.El                      \" Ends the list
+.Pp
+Please direct queries to Sveinbjorn Thordarson <sveinbt@hi.is>.
+.Pp
+.\" .Sh ENVIRONMENT      \" May not be needed
+.\" .Bl -tag -width "ENV_VAR_1" -indent \" ENV_VAR_1 is width of the string ENV_VAR_1
+.\" .It Ev ENV_VAR_1
+.\" Description of ENV_VAR_1
+.\" .It Ev ENV_VAR_2
+.\" Description of ENV_VAR_2
+.\" .El                      
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/bin/lsmac" -compact
+.It Pa /usr/bin/lsmac
+.\" .Sh DIAGNOSTICS       \" May not be needed
+.\" .Bl -diag
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr ls 1 ,
+.Xr setfctypes 1
+.Xr SetFile 1 ,
+.Xr GetFileInfo 1
+.\" .Sh BUGS              \" Document known, unremedied bugs 
+.\" .Sh HISTORY           \" Document history if command behaves in a unique manner 
+

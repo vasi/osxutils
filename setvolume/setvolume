@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+$vol = $ARGV[0];
+
+if ($vol eq "" or $vol !~ m/\d+/)
+{
+	printf("Usage: setvolume [1-100]\n");
+	exit(64);
+}
+
+system("/usr/bin/osascript -e 'set volume output volume $vol'");
+exit(0);

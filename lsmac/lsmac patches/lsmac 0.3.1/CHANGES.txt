@@ -1,0 +1,31 @@
+CHANGES.txt file for lsmac 0.3.1 created 09/04/2003.
+
+/*  CHANGES
+	0.3.1 - * lsmac human readable format is now base2 (MiB) rather then base10 (MB)
+			* added -B switch to show in base10 (MB)
+			* for more info on MiB see http://www.wikipedia.org/wiki/Byte_prefixes
+			* posibly fixed a bug with the physical size setting (was checking for the -l switch and then ignoring it)
+
+    0.3 -   * lsmac can now be told whether to list the size of resource fork, data fork or both.  Both is default
+            * -Q option: names/paths printed within quotation marks
+            * lsmac now displays file size in human readable format by default
+            * fixed error that occurred when listing root directory
+            * -F option: only folders are listed
+            * Num. of files within folders is now listed by default
+            * Some minor optimizations (f.e. stat used for determining directories, free & malloc instead of NewPtr & DisposePtr, etc.)
+            * Dynamic memory allocation for
+
+
+    0.2 - Tons of stuff changed/improved
+    
+            * lsmac now accepts command line options via getopt
+            * can display file size in bytes or human readable format
+                * The size displayed is the size of ALL the file's forks, not just the data fork!
+                * Option to display the physical size of file instead of logical
+            * can display full pathname of files instead of just the names
+            * can be set to omit directories in listing directory contents
+            * lsmac now has a man page lsmac(1)
+    
+    0.1 - First release of lsmac
+
+*/

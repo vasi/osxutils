@@ -1,0 +1,27 @@
+.Dd Tue Apr 01 2003
+.Dt trash 1
+.Os Darwin
+.Sh NAME
+.Nm trash
+.Nd Moves files to the Trash
+.Sh SYNOPSIS             
+.Nm
+[file] ...
+.Sh DESCRIPTION
+.Nm
+is akin to the 'rm' command but instead of unlinking files it moves them into the MacOS Trash
+in the user's home directory.  It behaves in a similar way to the Finder in this respect, since
+files are renamed to 'File copy 1' and so forth if they already exist in the Trash.                 
+.Sh FILES               
+.Bl -tag -width "/usr/local/bin/trash" -compact
+.It Pa /usr/local/bin/trash
+.El
+.Sh SEE ALSO 
+.Xr lsmac 1 ,
+.Xr setfctypes 1 ,
+.Xr setfflags 1 ,
+.Xr mkalias 1 ,
+.Xr setsuffix 1 ,
+.Xr SetFile 1 ,
+.Xr setfcomment 1 ,
+.Xr wsupdate 1 

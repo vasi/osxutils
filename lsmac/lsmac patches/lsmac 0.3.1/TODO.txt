@@ -1,0 +1,19 @@
+TODO.txt file for lsmac 0.3 created 06/04/2003.
+
+/*  TODO
+        
+        * Bug - errors may occur when listing folders containing more than 9999 files.
+        * Handle symlinks properly, i.e. not just list them as if they were the files they pointed to
+        * Bug - lsmac reports error when traversing /dev.
+        * Bug - Does not display size correctly for files larger than 4GB or so. 64bit int problem.
+        * Try to optimize speed.  lsmac default output is 3x-4x slower than ls -l
+        * Optimize memory usage
+        * Accept more than one argument to list, and, on a similar note...
+            * Make lsmac accept files as command line parameter, and then just print the info about those files
+        * Implement calculation of folder sizes - recursively scan through hierarchy and add up total size
+        * Display folder flags from the DInfo structure
+        * There is other Mac file meta-data not available via FSpGetFInfo() which should also be listed, f.e. comments
+        * -x option: list file suffixes in a seperate column
+        * List total size of all files listed on top, akin to ls -l
+
+*/

@@ -1,0 +1,46 @@
+.\"/usr/share/misc/mdoc.template
+.Dd Fri Apr 18 2003
+.Dt mkalias 1
+.Os Darwin
+.Sh NAME
+.Nm mkalias
+.Nd Create MacOS Finder aliases
+.Sh SYNOPSIS
+.Nm
+.Op Fl vhctr
+.Op Ar source-file 
+.Op Ar target-alias
+.Sh DESCRIPTION
+.Ar mkalias
+is similar to
+.Ar ln
+but creates MacOS Finder aliases instead of UNIX file system links.  The alias created is identical to
+aliases created manually using the Finder.  The alias gets the source file's custom icon and
+File and Creator type, and has the kIsAlias and kHasCustomIcon Finder flags set.
+.Pp
+The following options are accepted:
+.Bl -tag -width -indent
+.It Fl r
+Make the alias relative instead of absolute.  See http://developer.apple.com/technotes/tn/tn1188.html for why this is useful
+.It Fl c
+Omit copying source file's icon to target alias
+.It Fl t
+Source file's type and creator are not applied to the alias
+.It Fl v
+Print version and author
+.It Fl h
+Print help
+.El
+.Pp         
+.Sh FILES
+.Bl -tag -width "/usr/local/bin/mkalias" -compact
+.It Pa /usr/local/bin/mkalias
+.El
+.Sh SEE ALSO 
+.Xr ln 1 , 
+.Xr lsmac 1 ,
+.Xr setfctypes 1 ,
+.Xr setfflags 1 ,
+.Xr cpath 1 ,
+.Xr setsuffix 1 ,
+.Xr setfcomment 1 ,

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+#
+# ©2003 Sveinbjorn Thordarson <sveinbt@hi.is>
+# Move files to trash
+#
+use Shell;
+
+foreach $argnum ($cnt .. $#ARGV)
+{
+   $cnt = 1;
+   @path_segs = split(/\//, $ARGV[$argnum]);
+   while (-e "$ENV{HOME}/.Trash/$path_segs[$#path_segs]")
+   {
+        $path_segs[$#path_segs] .= " copy $cnt";
+   }
+   system("mv '$ARGV[$argnum]' '$ENV{HOME}/.Trash/$path_segs[$#path_segs]'");
+}

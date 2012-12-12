@@ -1,0 +1,66 @@
+.Dd Wed Mar 31 2003               \" DATE 
+.Dt setlabel 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm setlabel
+.Nd set MacOS Finder label of files and folders.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhs
+.Ar Label file ...
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Ar setlabel
+is a utility for setting the MacOS Finder label of files and folders.  This is done
+by modifying the meta-data flag fields in the HFS file record.  The available labels
+(case sensitive) are:
+.Pp
+None
+Red
+Orange
+Yellow
+Green
+Blue
+Purple
+Gray
+.Pp
+An example of typical usage would be:
+.Bl -tag -width -indent  
+.It setlabel Gray myfile.txt
+.El                      \" Ends the list
+.Pp
+The following options are supported:
+.Pp
+.Bl -tag -width indent  \" Differs from above in tag removed 
+.It Fl v                 \"-a flag as a list item
+Prints version and author and then exits
+.It Fl h
+Prints help
+.It Fl s
+Silent mode.  No output list or error reports are printed.
+.El                      \" Ends the list
+.Pp
+Please direct queries to Sveinbjorn Thordarson <sveinbt@hi.is>.
+.Pp                
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/setlabel" -compact
+.It Pa /usr/local/bin/setlabel
+.\" .Sh DIAGNOSTICS       \" May not be needed
+.\" .Bl -diag
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr SetFile 1 ,
+.Xr GetFileInfo 1 ,
+.Xr setfflags 1 ,
+.Xr setsuffix 1
+.Xr lsmac 1 , 
+.Xr setfcomment 1 ,
+.Xr setfctypes 1 ,  
+.\" .Sh BUGS              \" Document known, unremedied bugs 
+.\" .Sh HISTORY           \" Document history if command behaves in a unique manner 
+

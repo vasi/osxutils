@@ -1,0 +1,24 @@
+.Dd 11/11/04               \" DATE 
+.Dt rcmac 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm rcmac
+.Nd recursively lists all files in a hierarchy in the style of lsmac
+.Sh SYNOPSIS             
+.Nm
+[directory]                   
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm
+descends into directory structures and lists every single non-directory file within the structure in the style of 'lsmac'.  See the lsmac(1) man page for details.  The program accepts only one argument, which must be the path of a directory to descend into.
+.Pp
+.Pp             
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/rcmac" -compact
+.It Pa /usr/local/bin/rcmac
+.El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr lsmac 1 , 
+.Xr fileinfo 1 ,
+.Xr GetFileInfo 1 ,

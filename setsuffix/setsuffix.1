@@ -1,0 +1,48 @@
+.Dd Sun Apr 20 2003               \" DATE 
+.Dt setsuffix 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm setsuffix
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd Program to set, remove and replace filename suffices.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhsefar              \" [-vhsefar]
+.Op Fl l Ar length         \" [-l length]
+.Op Fl x Ar suffix         \" [-x suffix] 
+.Op Ar                   \" [file ...]
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm
+can be used to set, change and remove filename suffices.  Suffices are used by MacOS X to identify
+files and determined what application to employ when opening them.
+.Pp
+.Nm
+accepts the following options:
+.Bl -tag -width -indent  \" Differs from above in tag removed 
+.It Fl x [suffix]                 \"-a flag as a list item
+Use the -x option to specify the suffix you want added, without the leading dot (".")
+.It Fl l [length]
+Sets the max number of characters that can constitute a valid suffix.
+.Nm
+defaults to 4, so without this specification it will ignore all suffices longer than 4 characters.
+.It Fl s
+Silent mode.  Only critical errors or invalid usage errors are printed to stdout.
+.It Fl e
+Ignore files that already have a suffix.
+.It Fl f
+Ignore folders.
+.It Fl a
+Instead of replacing previous file suffix, add it.
+.It Fl r
+Remove file suffix.  If this option is specified, all other options apart from -l are ignored.
+.El                      \" Ends the list
+.Pp                   
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/setsuffix" -compact
+.It Pa /usr/local/bin/setsuffix
+.Sh SEE ALSO 
+.Xr lsmac 1 , 
+.Xr setfctypes 1 ,
+.Xr mkalias 1 ,
+.Xr cpath 1
+

@@ -1,0 +1,39 @@
+.Dd Wed Mar 31 2003               \" DATE 
+.Dt google 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm google
+.Nd start Google search from the command line in MacOS X.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Ar [-i]
+.Ar searchword ...
+
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Ar google
+is a very small and simple program that enables you to open a browser window with a google query from the command line.
+You can pass the search words as multiple arguments or as a single argument within brackets.
+
+An example of typical usage would be:
+.Bl -tag -width -indent  
+.It # google The Stuff That I need to look up
+.El
+
+or, alternatively
+.Bl -tag -width -indent  
+.It # google 'The Stuff That I need to look up'
+.El
+
+.Nm
+supports the following options:
+.Bl -tag -width indent
+.It Fl i             
+Search for images
+.El
+.Pp
+.Pp
+Please direct queries to Sveinbjorn Thordarson <sveinbt@hi.is>.
+.Pp                
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/setlabel" -compact
+.It Pa /usr/local/bin/google

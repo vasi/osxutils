@@ -1,0 +1,76 @@
+.Dd 12/18/04               \" DATE 
+.Dt hfsdata 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm hfsdata
+.Nd retrieve Mac meta-data for a file or folder
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vhxAcmatrRsSdDTCklLoOe              \" [-abcd]
+.Ar file                 \" Underlined argument - use .Ar anywhere to underline
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm
+is a command line tool to get all sorts of miscellaneous HFS or Mac OS-specific
+meta-data for a given file.  You can specify the exact
+meta-data you want to be printed as output by using one of these flags:
+.Bl -tag -width -indent  \" Differs from above in tag removed 
+.It Fl e
+Prints the path of the file pointed to by a given alias
+.It Fl x
+Prints whether file's suffix is hidden by the Finder or not
+.It Fl A
+Prints the name of the file's preferred application for opening
+.It Fl c
+Prints date created in standard format
+.It Fl m
+Prints date modified in standard format
+.It Fl a
+Prints date accessed in standard format
+.It Fl t
+Prints date attribute was modified in standard format
+.It Fl r
+Prints logical resource fork size in bytes
+.It Fl R
+Prints physical resource fork size in bytes
+.It Fl s
+Prints total logical size of all forks in bytes
+.It Fl S
+Prints total physical size of all forks in bytes
+.It Fl d
+Prints logical data fork size in bytes
+.It Fl D
+Prints physical data fork size in bytes
+.It Fl T
+Prints the file's 4-character type code
+.It Fl C
+Prints the file's 4-character creator code
+.It Fl k
+Prints the file's 'Kind', as it appears in the Finder
+.It Fl l
+Prints the file's label as a number (i.e. 0-8)
+.It Fl L
+Prints the file's label as a name (e.g. Green)
+.It Fl o
+Prints the file's Mac OS X Finder comment
+.It Fl O
+Prints the file's Mac OS 9 Desktop Database comment
+.It Fl v
+Prints hfsdata program version and exits
+.It Fl h
+Prints help
+.El                      \" Ends the list
+.Pp                   
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "/usr/local/bin/hfsdata" -compact
+.It Pa /usr/local/bin/hfsdata
+.El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr geticon 1 , 
+.Xr fileinfo 1 ,
+.Xr getfcomment 1 ,
+.Xr lsmac 1 ,
+.Xr setfflags 1 ,
+.Xr setfctypes 1 ,
+.Xr GetFileInfo 1

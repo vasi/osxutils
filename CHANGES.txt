@@ -1,0 +1,15 @@
+Version 1.7 Release notes
+
+Some new tools:
+
+* wiki tool
+* hfsdata tool
+* wsupdate tool
+* setvolume tool
+
+Updates to existing tools:
+* getfcomment now gets OS X comments, not just OS 9 Dekstop Database comments
+* Major bug fixes for lsmac
+* Minor bug fixes and code cleanup for setsuffix, setlabel, getfcomment, geticon, hfsdata, lsmac, mkalias, setfcomment, setfctypes, setfflags, seticon, setlabel
+* Updated man pages
+* New 'osxutils' overview tool

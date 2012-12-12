@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+#
+# ©2003 Sveinbjorn Thordarson <sveinbt@hi.is>
+# Search google with command line parameters
+#
+
+$numArgs = $#ARGV + 1;
+
+$google_url = "http://www.google.com/search?q=";
+$google_img_url = "http://images.google.com/images?q=";
+$cnt = 0;
+
+if ($ARGV[0] eq "-i")
+{
+    $google_url = $google_img_url;
+    $cnt = 1;
+}
+
+# Create query string to be passed
+foreach $argnum ($cnt .. $#ARGV)
+{
+   $query_string .= "$ARGV[$argnum]+"; 
+}
+
+#Replace spaces with plus
+$query_string =~ s/ /\+/;
+
+# Pass url to open command, which will open in default browser
+system("open '$google_url$query_string'");
