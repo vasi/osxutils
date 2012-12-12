@@ -121,7 +121,7 @@ static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr);
 
 static char* GetPathOfAliasSource (char *path);
 static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
-static OSErr FSpGetDInfo(const FSSpec* fileSpec, DInfo *dInfo);
+static OSErr GetDInfo(const FSRef *ref, DInfo *dInfo);
 static short GetLabelNumber (SInt16 flags);
 
 static OSErr MyFSPathMakeRef( const unsigned char *path, FSRef *ref );  // path to the link itself
@@ -446,7 +446,6 @@ static void ListItem (char *path, char *name)
 static void ListFile(char *name, char *path, FSRef fileRef)
 {
     /* File manager structures */
-    FSSpec		fileSpec;
     FInfo 		finderInfo;
 
     char		fileType[5];
@@ -466,21 +465,16 @@ static void ListFile(char *name, char *path, FSRef fileRef)
     OSErr		err = noErr;
 
     /* retrieve filespec from file ref */
-    err = FSGetCatalogInfo (&fileRef, NULL, NULL, NULL, &fileSpec, NULL);
+    FSCatalogInfo cinfo;
+    err = FSGetCatalogInfo (&fileRef, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
     if (err != noErr) 
     {
-        fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from file reference", err);
+        fprintf(stderr, "FSGetCatalogInfo(): Error %d getting finder info from file reference", err);
         exit(EX_IOERR);
     }
 
     /* get the finder info */
-    err = FSpGetFInfo (&fileSpec, &finderInfo);
-    if (err != noErr) 
-    {
-        fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder info from file spec", err);
-        fprintf(stderr, "%s\n", path);
-        exit(EX_IOERR);
-    }
+    finderInfo = *(FInfo*)cinfo.finderInfo;
 
     /* ///// Finder flags////// */
     
@@ -568,9 +562,8 @@ static void ListFolder (char *name, char *path, FSRef fileRef)
     char        fflagstr[7];
     short       labelNum;
     const char	*sizeStr;
-    const char	*humanSizeStr = "    -   ";
+    const char	*humanSizeStr = "     -   ";
     const char	*byteSizeStr  = "           -  ";
-    FSSpec      fileSpec;
     DInfo       dInfo;//directory information
 
     /*
@@ -599,8 +592,7 @@ static void ListFolder (char *name, char *path, FSRef fileRef)
 
 	quote = useQuotes ? '"' : ' ';
 
-        FSGetCatalogInfo (&fileRef, NULL, NULL, NULL, &fileSpec, NULL);
-        FSpGetDInfo(&fileSpec, &dInfo);
+        GetDInfo(&fileRef, &dInfo);
 
                 
         /* Is Invisible */
@@ -742,26 +734,26 @@ static char* GetSizeString (UInt64 size)
 
 static char* GetHumanSizeString (UInt64 size)
 {
-    static char	humanSizeStr[11];
+    static char	humanSizeStr[13];
 
     if (size < 1024) 
     {
                 /* bytes */
-        sprintf(humanSizeStr, "   %5d  B", (int)size);
+        sprintf(humanSizeStr, "   %6d  B", (int)size);
     } 
     else if (size < 1048576) {
             /* kbytes */
-        sprintf(humanSizeStr, "   %5.1f KB", size / 1024.0);
+        sprintf(humanSizeStr, "   %6.1f KB", size / 1024.0);
     } 
     else if (size < 1073741824) 
     {
             /* megabytes */
-        sprintf(humanSizeStr, "   %5.1f MB", size / 1048576.0);
+        sprintf(humanSizeStr, "   %6.1f MB", size / 1048576.0);
     } 
     else 
     {
 		/* gigabytes */
-		sprintf(humanSizeStr, "   %5.1f GB", size / 1073741824.0);
+		sprintf(humanSizeStr, "   %6.1f GB", size / 1073741824.0);
     }
 
     return (humanSizeStr);
@@ -1090,20 +1082,15 @@ static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize)
 // Returns directory info structure of 
 // file spec
 /////////////////////////////////////*/
-static OSErr FSpGetDInfo(const FSSpec* fileSpec, DInfo *dInfo)
+static OSErr GetDInfo(const FSRef *ref, DInfo *dInfo)
 {
-	CInfoPBRec	infoRec = {0};
 	OSErr		err = noErr;
-
-	infoRec.hFileInfo.ioNamePtr = (unsigned char *)fileSpec->name;
-	infoRec.hFileInfo.ioVRefNum = fileSpec->vRefNum;
-	infoRec.hFileInfo.ioDirID = fileSpec->parID;
-	err = PBGetCatInfoSync(&infoRec);
-	if (err == noErr) 
-        {
-                *dInfo = infoRec.dirInfo.ioDrUsrWds;
-	}
-
+	
+    FSCatalogInfo cinfo;
+    err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err == noErr) {
+        *dInfo = *(DInfo*)cinfo.finderInfo;
+    }
 	return err;
 }
 

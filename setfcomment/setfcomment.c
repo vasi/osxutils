@@ -70,16 +70,15 @@
 
     static char *GetCommentParameter (char *arg);
     static void SetFileComment (char *path, char *comment);
-    static OSErr OSX_SetComment (FSSpec *fileSpec, char *comment);
-    static OSErr OS9_SetComment (FSSpec *fileSpec, char *comment);
+    static OSErr OSX_SetComment (FSRef *fileRef, FSSpec *fileSpec, char *comment);
+    static OSErr OS9_SetComment (FSSpec *fileSpec, char *comment, bool *unsupported);
     static void PrintVersion (void);
     static void PrintHelp (void);
     
     // the stuff I ripped from MoreAppleEvents sample code
 
-    pascal OSErr MoreFESetComment(const FSSpecPtr pFSSpecPtr, const Str255 pCommentStr, const AEIdleUPP pIdleProcUPP);
+    pascal OSErr MoreFESetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr, const Str255 pCommentStr, const AEIdleUPP pIdleProcUPP);
     //pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
-    pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier);
     pascal OSStatus MoreAEOCreateObjSpecifierFromFSRef(const FSRefPtr pFSRefPtr,AEDesc *pObjSpecifier);
     pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,AEDesc *pObjSpecifier);
     pascal OSErr MoreAESendEventNoReturnValue (const AEIdleUPP pIdleProcUPP, const AppleEvent* pAppleEvent );
@@ -128,6 +127,9 @@ int main (int argc, const char * argv[])
                 return EX_USAGE;
         }
     }
+#if __LP64__
+    setOS9comment = 0;
+#endif
     
     if (comment == NULL)
     {
@@ -206,7 +208,7 @@ static void SetFileComment (char *path, char *comment)
     
     
             //being by setting MacOS X Finder Comment
-            err = OSX_SetComment (&fileSpec, comment);
+            err = OSX_SetComment (&fileRef, &fileSpec, comment);
             if (err != noErr)
             {
                 fprintf(stderr, "OSX_SetComment(): Error %d setting Finder comment for %s\n", err, path);
@@ -222,16 +224,19 @@ static void SetFileComment (char *path, char *comment)
                 return;
     
             //set MacOS 9 Comment
-            err = OS9_SetComment (&fileSpec, comment);
-            if (err != noErr)
-            {
-                fprintf(stderr, "OS9_SetComment(): Error %d setting MacOS 9 comment for %s\n", err, path);
-                return;
-            }
-            else if (!silentMode)
-			{
-                printf("MacOS 9 Comment set for %s\n", path);
-			}
+            bool unsupported = 0;
+            err = OS9_SetComment (&fileSpec, comment, &unsupported);
+            if (!unsupported) {
+                if (err != noErr)
+                {
+                    fprintf(stderr, "OS9_SetComment(): Error %d setting MacOS 9 comment for %s\n", err, path);
+                    return;
+                }
+                else if (!silentMode)
+    			{
+                    printf("MacOS 9 Comment set for %s\n", path);
+    			}
+    		}
 }
 
 
@@ -246,7 +251,7 @@ static void SetFileComment (char *path, char *comment)
 // the Finder.  As far as I know, there is no other way.
 // This will fail if the Finder isn't running....:(
 ///////////////////////////////////////////////////////////////////
-static OSErr OSX_SetComment (FSSpec *fileSpec, char *comment)
+static OSErr OSX_SetComment (FSRef *fileRef, FSSpec *fileSpec, char *comment)
 {
     OSErr	err = noErr;
     Str255	pCommentStr;
@@ -254,9 +259,14 @@ static OSErr OSX_SetComment (FSSpec *fileSpec, char *comment)
     if (strlen(comment) > MAX_COMMENT_LENGTH)
         return true;
 
-    CopyCStringToPascal(comment,pCommentStr);
+    // make a pascal string
+    strncpy((char*)pCommentStr + 1, comment, 255);
+    int len = strlen(comment);
+    if (len > 255)
+        len = 255;
+    pCommentStr[0] = len;
 
-    err = MoreFESetComment(fileSpec, pCommentStr, NULL);
+    err = MoreFESetComment(fileRef, fileSpec, pCommentStr, NULL);
     
     return(err);
 }
@@ -266,15 +276,19 @@ static OSErr OSX_SetComment (FSSpec *fileSpec, char *comment)
 // We set the MacOS 9 Finder comment using the File Manager API's
 // Desktop Database functions.
 ///////////////////////////////////////////////////////////////////
-static OSErr OS9_SetComment (FSSpec *fileSpec, char *comment)
+static OSErr OS9_SetComment (FSSpec *fileSpec, char *comment, bool *unsupported)
 {
+#if !__LP64__    
     OSErr	err = noErr;
-    
     DTPBRec dt;
         
     dt.ioVRefNum = (*fileSpec).vRefNum;
         
     err = PBDTGetPath(&dt);
+    if (err != noErr) {
+        *unsupported = true;
+        return err;
+    }
     
     //fill in the relevant fields (using parameters)
     dt.ioNamePtr = (*fileSpec).name;
@@ -290,7 +304,7 @@ static OSErr OS9_SetComment (FSSpec *fileSpec, char *comment)
         return err; 
         
     err = PBDTFlushSync (&dt);
-        
+#endif        
     return (noErr);
 }
 
@@ -349,19 +363,18 @@ static void PrintHelp (void)
 	
 	See note about idle functions above.
 */
-pascal OSErr MoreFESetComment(const FSSpecPtr pFSSpecPtr, const Str255 pCommentStr, const AEIdleUPP pIdleProcUPP)
+pascal OSErr MoreFESetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr, const Str255 pCommentStr, const AEIdleUPP pIdleProcUPP)
 {
 	AppleEvent tAppleEvent = {typeNull,nil};	//	If you always init AEDescs, it's always safe to dispose of them.
 	AEBuildError	tAEBuildError;
 	AEDesc 			tAEDesc = {typeNull,nil};
 	OSErr anErr = noErr;
 
-	anErr = MoreAEOCreateObjSpecifierFromFSSpec(pFSSpecPtr,&tAEDesc);
+	anErr = MoreAEOCreateObjSpecifierFromFSRef(pFSRefPtr,&tAEDesc);
 	if (noErr == anErr)
 	{
-		char* dataPtr = NewPtr(pCommentStr[0]);
-
-		CopyPascalStringToC(pCommentStr,dataPtr);
+		char* dataPtr = NewPtr(pCommentStr[0] + 1);
+        strncpy(dataPtr, (char*)pCommentStr + 1, pCommentStr[0]);
 		anErr = AEBuildAppleEvent(
 			        kAECoreSuite,kAESetData,
 					typeApplSignature,&gFinderSignature,sizeof(OSType),
@@ -426,25 +439,6 @@ pascal OSErr MoreFESetComment(const FSSpecPtr pFSSpecPtr, const Str255 pCommentS
 	return anErr;
 }	// end MoreFEGetComment
 */
-//********************************************************************************
-// A simple wrapper around CreateObjSpecifier which creates
-// an object specifier from a FSSpec using formName.
-pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier)
-{
-	OSErr 		anErr = paramErr;
-
-	if (nil != pFSSpecPtr)
-	{
-		FSRef tFSRef;
-
-		anErr = FSpMakeFSRef(pFSSpecPtr,&tFSRef);
-		if (noErr == anErr)
-		{
-			anErr = MoreAEOCreateObjSpecifierFromFSRef(&tFSRef,pObjSpecifier);
-		}
-	}
-	return anErr;
-}//end MoreAEOCreateObjSpecifierFromFSSpec
 
 
 
@@ -576,7 +570,7 @@ pascal	OSErr	MoreAEGetHandlerError(const AppleEvent* pAEReply)
 	{
 		OSErr	getErrErr = noErr;
 		
-		getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeShortInteger, &actualType,
+		getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeSInt16, &actualType,
 									&handlerErr, sizeof( OSErr ), &actualSize );
 		
 		if ( getErrErr != errAEDescNotFound )	// found an errorNumber parameter

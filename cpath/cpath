@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo -n $PWD | pbcopy
+/bin/echo -n $PWD | pbcopy

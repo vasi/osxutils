@@ -67,12 +67,43 @@
     static void PrintHelp (void);
     static int UnixIsFolder (char *path);
     static void SetLabelInFlags (short *flags, short labelNum);
-    static OSErr FSpGetPBRec(const FSSpec* fileSpec, CInfoPBRec *infoRec);
-    
+
 /////////////// Globals  /////////////////
 
 const char	labelNames[8][7] = { "None", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Gray" };
 short		silentMode = 0;
+
+
+static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo)
+{
+    FSCatalogInfo cinfo;
+    OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err != noErr)
+        return err;
+    *dInfo = *(DInfo*)cinfo.finderInfo;
+	return err;
+}
+static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo)
+{
+    FSCatalogInfo cinfo;
+    OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err != noErr)
+        return err;
+    *fInfo = *(FInfo*)cinfo.finderInfo;
+	return err;
+}
+static OSErr FSSetFInfo(const FSRef *ref, const FInfo *finfo) {
+	FSCatalogInfo cinfo;
+	*(FInfo*)cinfo.finderInfo = *finfo;
+	OSErr err = FSSetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo);
+	return err;
+}
+static OSErr FSSetDInfo(const FSRef *ref, const DInfo *dinfo) {
+	FSCatalogInfo cinfo;
+	*(DInfo*)cinfo.finderInfo = *dinfo;
+	OSErr err = FSSetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo);
+	return err;
+}
 
 int main (int argc, const char * argv[]) 
 {
@@ -143,7 +174,6 @@ static void SetFileLabel (char *path, short labelNum)
     short       isFldr;
     short       currentLabel;
     FInfo       finderInfo;
-    CInfoPBRec  infoRec;
 
 	//see if the file in question exists and we can write it
 	if (access(path, R_OK|W_OK|F_OK) == -1)
@@ -180,22 +210,24 @@ static void SetFileLabel (char *path, short labelNum)
 	
     if (isFldr)
     {
-        //Get HFS record
-        FSpGetPBRec(&fileSpec, &infoRec);
+        DInfo dInfo;
+		err = FSGetDInfo (&fileRef, &dInfo);
+		if (err != noErr) {
+			fprintf(stderr, "Error %d getting file Finder Directory Info\n", err);
+			return;
+		}
         
         //get current label
-        currentLabel = GetLabelNumber(infoRec.dirInfo.ioDrUsrWds.frFlags);
+        currentLabel = GetLabelNumber(dInfo.frFlags);
         
         //set new label into record
-        SetLabelInFlags(&infoRec.dirInfo.ioDrUsrWds.frFlags, labelNum);
+        SetLabelInFlags(&dInfo.frFlags, labelNum);
         
-        //fill in the requisite fields
-        infoRec.hFileInfo.ioNamePtr = (unsigned char *)fileSpec.name;
-		infoRec.hFileInfo.ioVRefNum = fileSpec.vRefNum;
-		infoRec.hFileInfo.ioDirID = fileSpec.parID;
-        
-        //set the record
-        PBSetCatInfoSync(&infoRec);
+        err = FSSetDInfo(&fileRef, &dInfo);
+		if (err != noErr) {
+			fprintf(stderr, "Error %d setting file Finder Directory Info\n", err);
+			return;
+		}
     }
     
     ///////////////////////// IF SPECIFIED FILE IS A REGULAR FILE /////////////////////////
@@ -203,7 +235,7 @@ static void SetFileLabel (char *path, short labelNum)
     else
     {
         /* get the finder info */
-        err = FSpGetFInfo (&fileSpec, &finderInfo);
+        err = FSGetFInfo (&fileRef, &finderInfo);
         if (err != noErr) 
         {
             if (!silentMode)
@@ -221,7 +253,7 @@ static void SetFileLabel (char *path, short labelNum)
         SetLabelInFlags(&finderInfo.fdFlags, labelNum);
         
         //apply the settings to the file
-        err = FSpSetFInfo (&fileSpec, &finderInfo);
+        err = FSSetFInfo (&fileRef, &finderInfo);
         if (err != noErr)
         {
             if (!silentMode)
@@ -418,26 +450,6 @@ static int UnixIsFolder (char *path)
     return (S_ISREG(filestat.st_mode) != 1);
 }
 
-
-/*//////////////////////////////////////
-// Returns directory info structure of 
-// file spec
-/////////////////////////////////////*/
-static OSErr FSpGetPBRec(const FSSpec* fileSpec, CInfoPBRec *infoRec)
-{
-	CInfoPBRec                  myInfoRec = {0};
-	OSErr                       err = noErr;
-
-	myInfoRec.hFileInfo.ioNamePtr = (unsigned char *)fileSpec->name;
-	myInfoRec.hFileInfo.ioVRefNum = fileSpec->vRefNum;
-	myInfoRec.hFileInfo.ioDirID = fileSpec->parID;
-	
-	err = PBGetCatInfoSync(&myInfoRec);
-    if (err == noErr)
-		*infoRec = myInfoRec;
-		
-	return err;
-}
 
 /*//////////////////////////////////////
 // Returns directory info structure of 

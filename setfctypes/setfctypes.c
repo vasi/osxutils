@@ -142,7 +142,6 @@ static void SetTypes (char *fileStr, OSType fileType, OSType creatorType)
 {
     OSErr	err = noErr;
     FSRef	fileRef;
-    FSSpec	fileSpec;
     FInfo 	finderInfo;
     short	c = 0;
 
@@ -180,22 +179,15 @@ static void SetTypes (char *fileStr, OSType fileType, OSType creatorType)
     }
     
     //retrieve filespec from file ref
-    err = FSGetCatalogInfo (&fileRef, NULL, NULL, NULL, &fileSpec, NULL);
+    FSCatalogInfo cinfo;
+    err = FSGetCatalogInfo (&fileRef, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
     if (err != noErr)
     {
         if (!silentMode)
-            fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec for %s", err, fileStr);
+            fprintf(stderr, "FSGetCatalogInfo(): Error %d getting Finder info for %s", err, fileStr);
         return;
     }
-    
-    //get the finder info   
-    err = FSpGetFInfo (&fileSpec, &finderInfo);
-    if (err != noErr)
-    {
-        if (!silentMode)
-            fprintf(stderr, "FSpGetFInfo(): Error %d getting Finder info for %s", err, fileStr);
-        return;
-    }
+    finderInfo = *(FInfo*)cinfo.finderInfo;
     
     c = false;
     
@@ -216,11 +208,12 @@ static void SetTypes (char *fileStr, OSType fileType, OSType creatorType)
     if (!c)
         return;
     
-    err = FSpSetFInfo (&fileSpec, &finderInfo);
+    *(FInfo*)cinfo.finderInfo = finderInfo;
+    err = FSSetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &cinfo);
     if (err != noErr)
     {
         if (!silentMode)
-            fprintf(stderr, "FSpSetFInfo(): Error %d setting Finder info for %s", err, fileStr);
+            fprintf(stderr, "FSSetCatalogInfo(): Error %d setting Finder info for %s", err, fileStr);
         return;
     }
 }

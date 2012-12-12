@@ -4,4 +4,4 @@
 #
 #
 
-find "$1" -type d -exec \/usr/local/bin/lsmac -o '{}' \;
+find "$1" -type d -exec lsmac -o '{}' \;

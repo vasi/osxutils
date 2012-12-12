@@ -156,6 +156,55 @@ int main (int argc, const char * argv[])
 
 #pragma mark -
 
+static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo) {
+    FSCatalogInfo cinfo;
+    OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err != noErr)
+        return err;
+    *fInfo = *(FInfo*)cinfo.finderInfo;
+	return err;
+}
+
+static OSErr FSSetFInfo(const FSRef* ref, FInfo *fInfo) {
+    FSCatalogInfo cinfo;
+    *(FInfo*)cinfo.finderInfo = *fInfo;
+    OSErr err = FSSetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo);
+	return err;
+}
+
+static OSErr myFSCreateResFile(const char *path, OSType creator, OSType fileType, FSRef *outRef) {
+    int fd = open(path, O_CREAT | O_WRONLY, 0666);
+    if (fd == -1) {
+        perror("opening destination:");
+        return bdNamErr;
+    }
+    close(fd);
+    
+    FSRef ref;
+    OSErr err = FSPathMakeRef((const UInt8*)path, &ref, NULL);
+    if (err != noErr)
+        return err;
+    
+	HFSUniStr255 rname;
+	FSGetResourceForkName(&rname);
+    err = FSCreateResourceFork(&ref, rname.length, rname.unicode, 0);
+    if (err != noErr)
+        return err;
+    
+    FInfo finfo;
+    err = FSGetFInfo(&ref, &finfo);
+    if (err != noErr)
+        return err;
+    finfo.fdCreator = creator;
+    finfo.fdType = fileType;
+    err = FSSetFInfo(&ref, &finfo);
+    if (err != noErr)
+        return err;
+    
+    *outRef = ref;
+    return noErr;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Given two path strings, srcPath and destPath, creates a MacOS Finder alias from file in srcPath
@@ -167,7 +216,7 @@ static void CreateAlias (char *srcPath, char *destPath)
 {
     OSErr		err;
     
-    FSSpec		sourceFSSpec, destFSSpec;
+    FSSpec		sourceFSSpec;
     FSRef		srcRef, destRef;
     OSType		srcFileType = (OSType)NULL;
 	OSType		srcCreatorType = (OSType)NULL;
@@ -203,26 +252,6 @@ static void CreateAlias (char *srcPath, char *destPath)
                     exit(EX_IOERR);
             }
             
-            //Apple's function to get FSRef from path refuses to create for nonexistent files, so
-            //we just create a temporary file and the remove it to get FSRef for destination
-            fd = open(destPath, O_CREAT | O_TRUNC | O_WRONLY);
-            
-            //file creation fails
-            if (fd == -1)//this can't happen, but just to be sure...
-            {
-                fprintf(stderr, "open(2): Error %d creating %s\n", errno, destPath);
-                exit(EX_CANTCREAT);
-            }
-            close(fd);
-            
-            //get file ref to dest
-            err = FSPathMakeRef(destPath, &destRef, NULL);
-            if (err != noErr)
-            {
-                    fprintf(stderr, "FSPathMakeRef: Error %d getting file ref for dest \"%s\"\n", err, destPath);
-                    exit(EX_IOERR);
-            }
-            
             //retrieve source filespec from source file ref
             err = FSGetCatalogInfo (&srcRef, NULL, NULL, NULL, &sourceFSSpec, NULL);
             if (err != noErr)
@@ -230,21 +259,11 @@ static void CreateAlias (char *srcPath, char *destPath)
                 fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from source FSRef\n", err);
                 exit(EX_IOERR);
             }
-			
-            //retrieve dest filespec from dest file ref
-            err = FSGetCatalogInfo (&destRef, NULL, NULL, NULL, &destFSSpec, NULL);
-            if (err != noErr)
-            {
-                printf("FSGetCatalogInfo(): Error %d getting file spec from dest FSRef\n", err);
-                exit(EX_IOERR);
-            }
-            
-            unlink(destPath);//temp file removed
-    
+			    
             //get the finder info for the source if it's a folder
             if (!isSrcFolder)
             {
-                    err = FSpGetFInfo (&sourceFSSpec, &srcFinderInfo);
+                    err = FSGetFInfo (&srcRef, &srcFinderInfo);
                     if (err != noErr)
                     {
                         fprintf(stderr, "FSpGetFInfo(): Error %d getting Finder info for source \"%s\"\n", err, srcPath);
@@ -258,7 +277,8 @@ static void CreateAlias (char *srcPath, char *destPath)
     
         if (!noCustomIconCopy)
         {
-            err = GetIconRefFromFile (&sourceFSSpec, &srcIconRef, &theLabel);
+            err = GetIconRefFromFileInfo(&srcRef, 0, NULL, 0, NULL,
+                kIconServicesNormalUsageFlag, &srcIconRef, &theLabel);
             if (err != noErr)
             {
                 fprintf(stderr, "GetIconRefFromFile(): Error getting source file's icon.\n");
@@ -276,15 +296,15 @@ static void CreateAlias (char *srcPath, char *destPath)
 		//
 		
 		// create the new file
-		FSpCreateResFile(&destFSSpec, 'TEMP', 'TEMP', smSystemScript);
-		if ((err = ResError()) != noErr)
+		err = myFSCreateResFile(destPath, 'TEMP', 'TEMP', &destRef);
+		if (err != noErr)
 		{
 			fprintf(stderr, "FSpCreateResFile(): Error %d while creating file\n", err);
 			exit(EX_CANTCREAT);
 		}
 
 		//create the alias record, relative to the new alias file
-		err = NewAlias(&destFSSpec, &sourceFSSpec, &alias);
+		err = FSNewAlias(&destRef, &srcRef, &alias);
 		if (err != noErr)
 		{
 			fprintf(stderr, "NewAlias(): Error %d while creating relative alias\n", err);
@@ -292,7 +312,7 @@ static void CreateAlias (char *srcPath, char *destPath)
 		}
     	
 		// save the resource
-		rsrcRefNum = FSpOpenResFile(&destFSSpec, fsRdWrPerm);
+		rsrcRefNum = FSOpenResFile(&destRef, fsRdWrPerm);
 		if (rsrcRefNum == -1) 
 		{ 
 			err = ResError(); 
@@ -300,7 +320,8 @@ static void CreateAlias (char *srcPath, char *destPath)
 			exit(EX_IOERR);
 		}
 		UseResFile(rsrcRefNum);
-		AddResource((Handle) alias, rAliasType, 0, destFSSpec.name);
+        Str255 rname;
+		AddResource((Handle) alias, rAliasType, 0, NULL);
 		if ((err = ResError()) != noErr)
 		{
 			fprintf(stderr, "Error %d while adding alias resource for %s", err, (char *)&destPath);
@@ -320,7 +341,7 @@ static void CreateAlias (char *srcPath, char *destPath)
             FSNewAliasMinimal (&srcRef, &alias);
             if (alias == NULL)
             {
-                fprintf(stderr, "NewAliasMinimal(): Null handle Alias returned from FSRef for file %s\n", sourceFSSpec.name);
+                fprintf(stderr, "NewAliasMinimal(): Null handle Alias returned from FSRef for file %s\n", srcPath);
                 exit(EX_IOERR);
             }
 			
@@ -329,12 +350,17 @@ static void CreateAlias (char *srcPath, char *destPath)
             // Otherwise, we use the same File/Creator as source file
             
             if (isSrcFolder)
-                FSpCreateResFile(&destFSSpec, 'MACS', 'fdrp', -1);
+                err = myFSCreateResFile(destPath, 'MACS', 'fdrp', &destRef);
             else
-                FSpCreateResFile(&destFSSpec, '    ', '    ', -1);
+                err = myFSCreateResFile(destPath, '    ', '    ', &destRef);
+    		if (err != noErr)
+    		{
+    			fprintf(stderr, "Error %d while creating alias file\n", err);
+    			exit(EX_CANTCREAT);
+    		}
             
             //open resource file and write the relevant resources
-            rsrcRefNum = FSpOpenResFile (&destFSSpec, 3);
+            rsrcRefNum = FSOpenResFile (&destRef, 3);
             
                 //write the alias resource
                 AddResource ((Handle)alias, 'alis', 0, NULL);
@@ -353,10 +379,10 @@ static void CreateAlias (char *srcPath, char *destPath)
     
     
             //get finder info on newly created alias
-            err = FSpGetFInfo (&destFSSpec, &destFinderInfo);
+            err = FSGetFInfo (&destRef, &destFinderInfo);
             if (err != noErr)
             {
-                printf("FSpGetFInfo(): Error %d getting Finder info for target alias \"%s\"\n", err, srcPath);
+                printf("FSpGetFInfo(): Error %d getting Finder info for target alias \"%s\"\n", err, destPath);
                 exit(EX_IOERR);
             }
             
@@ -375,7 +401,7 @@ static void CreateAlias (char *srcPath, char *destPath)
      	        destFinderInfo.fdCreator = srcCreatorType;
      	    }
             
-            err = FSpSetFInfo (&destFSSpec, &destFinderInfo);
+            err = FSSetFInfo (&destRef, &destFinderInfo);
             if (err != noErr)
             {
                 printf("FSpSetFInfo(): Error %d setting Finder Alias flag (0x8000).\n", err);

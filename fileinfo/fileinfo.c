@@ -131,6 +131,15 @@ void PrintFileInfo (char *path);
 static int UnixIsFolder (char *path);
 static OSErr GetForkSizes (const FSRef *fileRef,  UInt64 *totalLogicalForkSize, UInt64 *totalPhysicalForkSize, short fork);
 
+OSErr RetrieveStatData (FileInfoStruct *file);
+OSErr RetrieveFileInfo (FileInfoStruct *file);
+OSErr ProcessFinderInfo (FileInfoStruct *file);
+char* GetFileNameFromPath (char *name);
+static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
+static char* GetSizeString( UInt64 size, short sizeFormat);
+OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString);
+static short GetLabelNumber (short flags);
+
 
 /*//////////////////////////////////////
 // Main program function
@@ -353,8 +362,8 @@ OSErr RetrieveFileInfo (FileInfoStruct *file)
     }
 	
 		//finder info
-		BlockMove(&cinfo.finderInfo, &file->finderInfo, sizeof(FInfo));
-		BlockMove(&cinfo.extFinderInfo, &file->finderXInfo, sizeof(FXInfo));
+    file->finderInfo = *(FInfo*)cinfo.finderInfo;
+    file->finderXInfo = *(FXInfo*)cinfo.extFinderInfo;
 		
 		//file size
 		file->rsrcPhysicalSize = cinfo.rsrcPhysicalSize;
@@ -408,7 +417,8 @@ OSErr ProcessFinderInfo (FileInfoStruct *file)
 
 	/* Is Stationery */
 	file->finderFlags[5] = (file->finderInfo.fdFlags & kIsStationery) ? 1 : 0;
-
+	
+    return noErr;
 }
 
 
@@ -610,23 +620,18 @@ void OSTypeToStr(OSType aType, char *aStr)
 OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString)
 {
 	CFAbsoluteTime  cfTime;
-	LongDateTime	ldTime;
-	Str255			pDateStr, pTimeStr;
-	char			dateStr[128], timeStr[128];
-	OSErr			err = noErr;
-
-	err = UCConvertUTCDateTimeToCFAbsoluteTime (utcDateTime, &cfTime);
-	err = UCConvertCFAbsoluteTimeToLongDateTime (cfTime, &ldTime);
-	
-	LongDateString (&ldTime, shortDate, pDateStr, NULL);
-	LongTimeString (&ldTime, TRUE, pTimeStr, NULL);
-	
-	CopyPascalStringToC (pDateStr, &dateStr);
-	CopyPascalStringToC (pTimeStr, &timeStr);
-	
-	strcpy(dateTimeString, &timeStr);
-	strcat(dateTimeString, &" ");
-	strcat(dateTimeString, &dateStr);
+	OSErr err = UCConvertUTCDateTimeToCFAbsoluteTime (utcDateTime, &cfTime);
+    
+    CFLocaleRef locale = CFLocaleCopyCurrent();
+    CFDateRef date = CFDateCreate(NULL, cfTime);
+    CFDateFormatterRef formatter = CFDateFormatterCreate(NULL, locale,
+        kCFDateFormatterLongStyle, kCFDateFormatterLongStyle);
+    CFRelease(locale);
+    CFStringRef dstr = CFDateFormatterCreateStringWithDate(NULL, formatter, date);
+    CFRelease(date);
+    CFRelease(formatter);
+    CFStringGetCString(dstr, dateTimeString, 256, kCFStringEncodingUTF8);
+    CFRelease(dstr);
 	
 	return err;
 }

@@ -120,7 +120,8 @@
 	static Boolean IsFolder (FSRef *fileRef);
 	static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr);
 	static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
-	static OSErr FSpGetDInfo(const FSSpec* fileSpec, DInfo *dInfo);
+	static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo);
+	static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo);
 	static short GetLabelNumber (short flags);
 	static OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString);
 	
@@ -129,13 +130,13 @@
 	static void PrintHelp (void);
 	
 	static OSErr PrintOSXComment (FSRef	*fileRef);
+#if !__LP64__
 	static OSErr PrintOS9Comment (FSRef *fileRef);
-	
+#endif
 	//AE functions from MoreAppleEvents.c, Apple's sample code
-	pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
+	pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
 	pascal void MoreAEDisposeDesc(AEDesc* desc);
 	pascal void MoreAENullDesc(AEDesc* desc);
-	pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAEOCreateObjSpecifierFromFSRef(const FSRefPtr pFSRefPtr,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAESendEventReturnAEDesc(const AEIdleUPP    pIdleProcUPP, const AppleEvent  *pAppleEvent,const DescType    pDescType, AEDesc        *pAEDesc);
@@ -159,7 +160,11 @@
 #define		PROGRAM_STRING  	"hfsdata"
 #define		VERSION_STRING		"0.1"
 #define		AUTHOR_STRING 		"Sveinbjorn Thordarson"
+#if __LP64__
+#define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|e] file\nor\nhfsdata [-hv]\n"
+#else
 #define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|O|e] file\nor\nhfsdata [-hv]\n"
+#endif
 
 // The Mac Four-Character Application Signature for the Finder
 static const OSType gFinderSignature = 'MACS';
@@ -240,9 +245,11 @@ int main (int argc, const char * argv[])
 			case 'o':
 				type = kMacOSXComment;
 				break;
+#if !__LP64__
 			case 'O':
 				type = kMacOS9Comment;
 				break;
+#endif
 			case 'e':
 				type = kAliasOriginal;
 				break;
@@ -333,9 +340,11 @@ int main (int argc, const char * argv[])
 		case kMacOSXComment:
 			err = PrintOSXComment(&fileRef);
 			break;
+#if !__LP64__
 		case kMacOS9Comment:
 			err = PrintOS9Comment(&fileRef);
 			break;
+#endif
 		case kAliasOriginal:
 			err = PrintAliasSource(&fileRef);
 			break;
@@ -652,7 +661,7 @@ static OSErr PrintFileType (FSRef *fileRef)
         return err;
     }
 	// get Finder File Info
-	err = FSpGetFInfo (&fileSpec, &finderInfo);
+	err = FSGetFInfo (fileRef, &finderInfo);
 	if (err != noErr)
 	{
 		fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
@@ -692,7 +701,7 @@ static OSErr PrintCreatorCode (FSRef *fileRef)
         return err;
     }
 	// get Finder File Info
-	err = FSpGetFInfo (&fileSpec, &finderInfo);
+	err = FSGetFInfo (fileRef, &finderInfo);
 	if (err != noErr)
 	{
 		fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
@@ -788,7 +797,7 @@ static OSErr PrintLabelName (FSRef *fileRef)
 	
 	if (IsFolder(fileRef))
 	{
-		err = FSpGetDInfo (&fileSpec, &dInfo);
+		err = FSGetDInfo (fileRef, &dInfo);
 		if (err != noErr)
 		{
 			fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder Directory Info from file spec\n", err);
@@ -798,7 +807,7 @@ static OSErr PrintLabelName (FSRef *fileRef)
 	}
 	else
 	{
-		err = FSpGetFInfo (&fileSpec, &finderInfo);
+		err = FSGetFInfo (fileRef, &finderInfo);
 		if (err != noErr)
 		{
 			fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
@@ -830,7 +839,7 @@ static OSErr PrintLabelNumber (FSRef *fileRef)
 	
 	if (IsFolder(fileRef))
 	{
-		err = FSpGetDInfo (&fileSpec, &dInfo);
+		err = FSGetDInfo (fileRef, &dInfo);
 		if (err != noErr)
 		{
 			fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder Directory Info from file spec\n", err);
@@ -840,7 +849,7 @@ static OSErr PrintLabelNumber (FSRef *fileRef)
 	}
 	else
 	{
-		err = FSpGetFInfo (&fileSpec, &finderInfo);
+		err = FSGetFInfo (fileRef, &finderInfo);
 		if (err != noErr)
 		{
 			fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
@@ -933,20 +942,22 @@ static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize)
 // Returns directory info structure of 
 // file spec
 /////////////////////////////////////*/
-static OSErr FSpGetDInfo(const FSSpec* fileSpec, DInfo *dInfo)
+static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo)
 {
-	CInfoPBRec	infoRec = {0};
-	OSErr		err = noErr;
-
-	infoRec.hFileInfo.ioNamePtr = (unsigned char *)fileSpec->name;
-	infoRec.hFileInfo.ioVRefNum = fileSpec->vRefNum;
-	infoRec.hFileInfo.ioDirID = fileSpec->parID;
-	err = PBGetCatInfoSync(&infoRec);
-	if (err == noErr) 
-        {
-                *dInfo = infoRec.dirInfo.ioDrUsrWds;
-	}
-
+    FSCatalogInfo cinfo;
+    OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err != noErr)
+        return err;
+    *dInfo = *(DInfo*)cinfo.finderInfo;
+	return err;
+}
+static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo)
+{
+    FSCatalogInfo cinfo;
+    OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+    if (err != noErr)
+        return err;
+    *fInfo = *(FInfo*)cinfo.finderInfo;
 	return err;
 }
 
@@ -989,26 +1000,21 @@ static short GetLabelNumber (short flags)
 }
 
 
-static OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString)
+OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString)
 {
 	CFAbsoluteTime  cfTime;
-	LongDateTime	ldTime;
-	Str255			pDateStr, pTimeStr;
-	char			dateStr[128], timeStr[128];
-	OSErr			err = noErr;
-
-	err = UCConvertUTCDateTimeToCFAbsoluteTime (utcDateTime, &cfTime);
-	err = UCConvertCFAbsoluteTimeToLongDateTime (cfTime, &ldTime);
-	
-	LongDateString (&ldTime, shortDate, pDateStr, NULL);
-	LongTimeString (&ldTime, TRUE, pTimeStr, NULL);
-	
-	CopyPascalStringToC (pDateStr, (char *)&dateStr);
-	CopyPascalStringToC (pTimeStr, (char *)&timeStr);
-	
-	strcpy(dateTimeString, (char *)&timeStr);
-	strcat(dateTimeString, (char *)&" ");
-	strcat(dateTimeString, (char *)&dateStr);
+	OSErr err = UCConvertUTCDateTimeToCFAbsoluteTime (utcDateTime, &cfTime);
+    
+    CFLocaleRef locale = CFLocaleCopyCurrent();
+    CFDateRef date = CFDateCreate(NULL, cfTime);
+    CFDateFormatterRef formatter = CFDateFormatterCreate(NULL, locale,
+        kCFDateFormatterLongStyle, kCFDateFormatterLongStyle);
+    CFRelease(locale);
+    CFStringRef dstr = CFDateFormatterCreateStringWithDate(NULL, formatter, date);
+    CFRelease(date);
+    CFRelease(formatter);
+    CFStringGetCString(dstr, dateTimeString, 256, kCFStringEncodingUTF8);
+    CFRelease(dstr);
 	
 	return err;
 }
@@ -1067,7 +1073,9 @@ static void PrintHelp (void)
 	puts("\t-L  Prints the file's label as a name (e.g. Green)");
 	puts("");
 	puts("\t-o  Prints the file's Mac OS X Finder comment");
+#if !__LP64__
 	puts("\t-O  Prints the file's Mac OS 9 Desktop Database comment");
+#endif
 	puts("");
 	
 }
@@ -1094,7 +1102,7 @@ static OSErr PrintOSXComment (FSRef	*fileRef)
 
 	// call the apple event routine. I'm not going to pretend I understand what's going on
 	// in all those horribly kludgy functions, but at least it works.
-	err = MoreFEGetComment(&fileSpec, comment, inIdleProc);
+	err = MoreFEGetComment(fileRef, &fileSpec, comment, inIdleProc);
 	if (err)
 	{
 		fprintf(stderr, "Error %d getting comment\n", err);
@@ -1113,7 +1121,7 @@ static OSErr PrintOSXComment (FSRef	*fileRef)
 }
 
 
-
+#if !__LP64__
 static OSErr PrintOS9Comment (FSRef *fileRef)
 {
 	OSErr	err = noErr;
@@ -1137,7 +1145,7 @@ static OSErr PrintOS9Comment (FSRef *fileRef)
     err = PBDTGetPath(&dt);
 	if (err != noErr)
 	{
-		fprintf(stderr, "PBDTGetPath(): Error %d getting OS9 comment\n", err);
+		fprintf(stderr, "Can't get OS 9 comments\n");
 		return err;
 	}
     
@@ -1155,7 +1163,7 @@ static OSErr PrintOS9Comment (FSRef *fileRef)
 	}
 	return noErr;
 }
-
+#endif
 
 
 
@@ -1170,7 +1178,7 @@ Boolean MyAEIdleCallback (
 	return 0;
 }
 
-pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP)
+pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP)
 {
   AppleEvent tAppleEvent = {typeNull,NULL};  //  If you always init AEDescs, it's always safe to dispose of them.
   AEDesc tAEDesc = {typeNull,NULL};
@@ -1181,7 +1189,7 @@ pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,cons
 	fprintf(stderr, "No proc pointer\n");
     return paramErr;
   }
-  anErr = MoreAEOCreateObjSpecifierFromFSSpec(pFSSpecPtr,&tAEDesc);
+  anErr = MoreAEOCreateObjSpecifierFromFSRef(pFSRefPtr,&tAEDesc);
   if (anErr)
   {
 	fprintf(stderr, "Error creating objspecifier from fsspec\n");
@@ -1310,28 +1318,6 @@ pascal void MoreAENullDesc(AEDesc* desc)
 	desc->descriptorType = typeNull;
 	desc->dataHandle     = nil;
 }//end MoreAENullDesc
-
-//********************************************************************************
-// A simple wrapper around CreateObjSpecifier which creates
-// an object specifier from a FSSpec using formName.
-pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier)
-{
-	OSErr 		anErr = paramErr;
-
-	if (nil != pFSSpecPtr)
-	{
-		FSRef tFSRef;
-
-		anErr = FSpMakeFSRef(pFSSpecPtr,&tFSRef);
-		if (noErr == anErr)
-		{
-			anErr = MoreAEOCreateObjSpecifierFromFSRef(&tFSRef,pObjSpecifier);
-		}
-	}
-	return anErr;
-}//end MoreAEOCreateObjSpecifierFromFSSpec
-
-
 
 //********************************************************************************
 // A simple wrapper around CreateObjSpecifier which creates
@@ -1469,7 +1455,7 @@ pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply)
   {
     OSErr  getErrErr = noErr;
     
-    getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeShortInteger, &actualType,
+    getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeSInt16, &actualType,
                   &handlerErr, sizeof( OSErr ), &actualSize );
     
     if ( getErrErr != errAEDescNotFound )  // found an errorNumber parameter

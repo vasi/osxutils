@@ -78,10 +78,9 @@ static const OSType gFinderSignature = 'MACS';
     static void PrintHelp (void);
 	
 	//AE functions from MoreAppleEvents.c, Apple's sample code
-	pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
+    pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
 	pascal void MoreAEDisposeDesc(AEDesc* desc);
 	pascal void MoreAENullDesc(AEDesc* desc);
-	pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAEOCreateObjSpecifierFromFSRef(const FSRefPtr pFSRefPtr,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,AEDesc *pObjSpecifier);
 	pascal OSStatus MoreAESendEventReturnAEDesc(const AEIdleUPP    pIdleProcUPP, const AppleEvent  *pAppleEvent,const DescType    pDescType, AEDesc        *pAEDesc);
@@ -116,9 +115,11 @@ int main (int argc, const char * argv[])
 			case 'p':
 				printFileName = true;
 				break;
+#if !__LP64__
 			case 'c':
 				os9comment = true;
 				break;
+#endif
             default: // '?'
                 rc = 1;
                 PrintHelp();
@@ -176,7 +177,7 @@ static void PrintOSXComment (char *path)
 
 	// call the apple event routine. I'm not going to pretend I understand what's going on
 	// in all those horribly kludgy functions, but at least it works.
-	err = MoreFEGetComment(&fileSpec, comment, inIdleProc);
+	err = MoreFEGetComment(&fileRef, &fileSpec, comment, inIdleProc);
 	if (err)
 	{
 		fprintf(stderr, "Error %d getting comment for '%s'\n", err, path);
@@ -201,6 +202,7 @@ static void PrintOSXComment (char *path)
 
 static void PrintFileComment (char *path)
 {
+#if !__LP64__
 	OSErr	err = noErr;
     FSRef	fileRef;
     FSSpec	fileSpec;
@@ -236,6 +238,11 @@ static void PrintFileComment (char *path)
 	dt.ioVRefNum = fileSpec.vRefNum;
         
     err = PBDTGetPath(&dt);
+	if (err != noErr)
+	{
+		fprintf(stderr, "Can't get OS 9 comments for %s\n", path);
+		return;
+	}
     
     //fill in the relevant fields (using parameters)
     dt.ioNamePtr = fileSpec.name;
@@ -253,6 +260,7 @@ static void PrintFileComment (char *path)
 			printf("Comment for '%s':\n%s\n", path, (char *)&comment);
 	}
 	return;
+#endif
 }
 
 
@@ -286,7 +294,7 @@ Boolean MyAEIdleCallback (
 	return 0;
 }
 
-pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP)
+pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP)
 {
   AppleEvent tAppleEvent = {typeNull,NULL};  //  If you always init AEDescs, it's always safe to dispose of them.
   AEDesc tAEDesc = {typeNull,NULL};
@@ -297,7 +305,7 @@ pascal OSErr MoreFEGetComment(const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,cons
 	fprintf(stderr, "No proc pointer\n");
     return paramErr;
   }
-  anErr = MoreAEOCreateObjSpecifierFromFSSpec(pFSSpecPtr,&tAEDesc);
+  anErr = MoreAEOCreateObjSpecifierFromFSRef(pFSRefPtr,&tAEDesc);
   if (anErr)
   {
 	fprintf(stderr, "Error creating objspecifier from fsspec\n");
@@ -426,26 +434,6 @@ pascal void MoreAENullDesc(AEDesc* desc)
 	desc->descriptorType = typeNull;
 	desc->dataHandle     = nil;
 }//end MoreAENullDesc
-
-//********************************************************************************
-// A simple wrapper around CreateObjSpecifier which creates
-// an object specifier from a FSSpec using formName.
-pascal OSStatus MoreAEOCreateObjSpecifierFromFSSpec(const FSSpecPtr pFSSpecPtr,AEDesc *pObjSpecifier)
-{
-	OSErr 		anErr = paramErr;
-
-	if (nil != pFSSpecPtr)
-	{
-		FSRef tFSRef;
-
-		anErr = FSpMakeFSRef(pFSSpecPtr,&tFSRef);
-		if (noErr == anErr)
-		{
-			anErr = MoreAEOCreateObjSpecifierFromFSRef(&tFSRef,pObjSpecifier);
-		}
-	}
-	return anErr;
-}//end MoreAEOCreateObjSpecifierFromFSSpec
 
 
 
@@ -585,7 +573,7 @@ pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply)
   {
     OSErr  getErrErr = noErr;
     
-    getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeShortInteger, &actualType,
+    getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeSInt16, &actualType,
                   &handlerErr, sizeof( OSErr ), &actualSize );
     
     if ( getErrErr != errAEDescNotFound )  // found an errorNumber parameter

@@ -16,6 +16,21 @@
 #import "IconFamily.h"
 #import "NSString+CarbonFSSpecCreation.h"
 
+static OSErr GetFSRefFInfo(const FSRef *ref, FInfo *finfo) {
+	FSCatalogInfo cinfo;
+	OSErr err = FSGetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo, NULL, NULL, NULL);
+	if (err != noErr)
+		return err;
+	*finfo = *(FInfo*)cinfo.finderInfo;
+}
+
+static OSErr SetFSRefFInfo(const FSRef *ref, const FInfo *finfo) {
+	FSCatalogInfo cinfo;
+	*(FInfo*)cinfo.finderInfo = *finfo;
+	OSErr err = FSSetCatalogInfo(ref, kFSCatInfoFinderInfo, &cinfo);
+	return err;
+}
+
 @interface IconFamily (Internals)
 
 + (NSImage*) resampleImage:(NSImage*)image toIconWidth:(int)width usingImageInterpolation:(NSImageInterpolation)imageInterpolation;
@@ -87,7 +102,7 @@
 
 - initWithContentsOfFile:(NSString*)path
 {
-    FSSpec fsSpec;
+    FSRef fsRef;
     OSErr result;
     
     self = [self init];
@@ -96,11 +111,11 @@
             DisposeHandle( (Handle)hIconFamily );
             hIconFamily = NULL;
         }
-		if (![path getFSSpec:&fsSpec createFileIfNecessary:NO]) {
+		if (![path getFSRef:&fsRef createFileIfNecessary:NO]) {
 			[self autorelease];
 			return nil;
 		}
-		result = ReadIconFile( &fsSpec, &hIconFamily );
+		result = ReadIconFromFSRef( &fsRef, &hIconFamily );
 		if (result != noErr) {
 			[self autorelease];
 			return nil;
@@ -129,7 +144,7 @@
     IconRef	iconRef;
     OSErr	result;
     SInt16	label;
-    FSSpec	fileSpec;
+    FSRef	fileRef;
 
     self = [self init];
     if (self)
@@ -140,14 +155,15 @@
             hIconFamily = NULL;
         }
 
-        if( ![path getFSSpec:&fileSpec createFileIfNecessary:NO] )
+        if( ![path getFSRef:&fileRef createFileIfNecessary:NO] )
         {
             [self autorelease];
             return nil;
         }
 
-        result = GetIconRefFromFile(
-                                    &fileSpec,
+        result = GetIconRefFromFileInfo(
+                                    &fileRef, 0, NULL, 0, NULL,
+									kIconServicesNormalUsageFlag,
                                     &iconRef,
                                     &label );
 
@@ -531,27 +547,15 @@
     if (result != noErr)
         return NO;
 	
-    // Get the file's type and creator codes.
-	fileAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
-	if (fileAttributes)
-	{
-		existingType = [fileAttributes fileHFSTypeCode];
-		existingCreator = [fileAttributes fileHFSCreatorCode];
-    }
-	
-    // Make sure the file has a resource fork that we can open.  (Although
-    // this sounds like it would clobber an existing resource fork, the Carbon
-    // Resource Manager docs for this function say that's not the case.  If
-    // the file already has a resource fork, we receive a result code of
-    // dupFNErr, which is not really an error per se, but just a notification
-    // to us that creating a new resource fork for the file was not necessary.)
-    FSpCreateResFile( &targetFileFSSpec, existingCreator, existingType, smRoman );
-    result = ResError();
-    if (!(result == noErr || result == dupFNErr))
+    // Make sure the file has a resource fork that we can open.
+	HFSUniStr255 rname;
+	FSGetResourceForkName(&rname);
+	result = FSCreateResourceFork(&targetFileFSRef, rname.length, rname.unicode, 0);
+    if (!(result == noErr || result == errFSForkExists))
 		return NO;
     
     // Open the file's resource fork.
-    file = FSpOpenResFile( &targetFileFSSpec, fsRdWrPerm );
+    file = FSOpenResFile( &targetFileFSRef, fsRdWrPerm );
     if (file == -1)
 		return NO;
         
@@ -597,7 +601,7 @@
 	
     // Now we need to set the file's Finder info so the Finder will know that
     // it has a custom icon.  Start by getting the file's current finder info:
-    result = FSpGetFInfo( &targetFileFSSpec, &finderInfo );
+    result = GetFSRefFInfo( &targetFileFSRef, &finderInfo );
     if (result != noErr)
 		return NO;
     
@@ -610,7 +614,7 @@
     finderInfo.fdFlags = (finderInfo.fdFlags | kHasCustomIcon ) & ~kHasBeenInited;
 	
     // Now write the Finder info back.
-    result = FSpSetFInfo( &targetFileFSSpec, &finderInfo );
+    result = SetFSRefFInfo( &targetFileFSRef, &finderInfo );
     if (result != noErr)
 		return NO;
         
@@ -640,7 +644,7 @@
         return NO;
 	
     // Open the file's resource fork, if it has one.
-    file = FSpOpenResFile( &targetFileFSSpec, fsRdWrPerm );
+    file = FSOpenResFile( &targetFileFSRef, fsRdWrPerm );
     if (file == -1)
         return NO;
 
@@ -657,7 +661,7 @@
 
     // Now we need to set the file's Finder info so the Finder will know that
     // it has no custom icon.  Start by getting the file's current finder info:
-    result = FSpGetFInfo( &targetFileFSSpec, &finderInfo );
+    result = GetFSRefFInfo( &targetFileFSRef, &finderInfo );
     if (result != noErr)
         return NO;
 
@@ -665,7 +669,7 @@
     finderInfo.fdFlags = finderInfo.fdFlags & ~(kHasCustomIcon | kHasBeenInited);
 
     // Now write the Finder info back.
-    result = FSpSetFInfo( &targetFileFSSpec, &finderInfo );
+    result = SetFSRefFInfo( &targetFileFSRef, &finderInfo );
     if (result != noErr)
         return NO;
 
@@ -717,15 +721,15 @@
     if( ![path getFSRef:&targetFolderFSRef createFileIfNecessary:NO] )
         return NO;
 
-    // Make sure the file has a resource fork that we can open.  (Although
-    // this sounds like it would clobber an existing resource fork, the Carbon
-    // Resource Manager docs for this function say that's not the case.)
-    FSpCreateResFile( &targetFileFSSpec, kUnknownType, kUnknownType, smRoman );
-    if (ResError() != noErr)
-        return NO;
+    // Make sure the file has a resource fork that we can open.
+	HFSUniStr255 rname;
+	FSGetResourceForkName(&rname);
+	result = FSCreateResourceFork(&targetFolderFSRef, rname.length, rname.unicode, 0);
+    if (!(result == noErr || result == errFSForkExists))
+		return NO;
 
-    // Open the file's resource fork.
-    file = FSpOpenResFile( &targetFileFSSpec, fsRdWrPerm );
+    // Open the file's resource fork, if it has one.
+    file = FSOpenResFile( &targetFolderFSRef, fsRdWrPerm );
     if (file == -1)
         return NO;
 
@@ -771,12 +775,12 @@
         return NO;
 
     // Make folder icon file invisible
-    result = FSpGetFInfo( &targetFileFSSpec, &finderInfo );
+    result = GetFSRefFInfo( &targetFolderFSRef, &finderInfo );
     if (result != noErr)
         return NO;
     finderInfo.fdFlags = (finderInfo.fdFlags | kIsInvisible ) & ~kHasBeenInited;
     // And write info back
-    result = FSpSetFInfo( &targetFileFSSpec, &finderInfo );
+    result = SetFSRefFInfo( &targetFolderFSRef, &finderInfo );
     if (result != noErr)
         return NO;
 
@@ -1347,6 +1351,7 @@
 // Methods for interfacing with the Carbon Scrap Manager (analogous to and
 // interoperable with the Cocoa Pasteboard).
 
+/*
 @implementation IconFamily (ScrapAdditions)
 
 + (BOOL) canInitWithScrap
@@ -1417,5 +1422,5 @@
 }
 
 @end
-
+*/
 
