@@ -139,6 +139,7 @@ static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
 static char* GetSizeString( UInt64 size, short sizeFormat);
 OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString);
 static short GetLabelNumber (short flags);
+void OSTypeToStr(OSType aType, char *aStr);
 
 
 /*//////////////////////////////////////

@@ -114,7 +114,7 @@ int main (int argc, const char * argv[])
         }
     }
 
-	(char *)src = (char *)argv[optind];
+	src = (char *)argv[optind];
 
 	//check if a correct number of arguments was submitted
     if (argc < 2 || src == NULL)

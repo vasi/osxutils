@@ -97,7 +97,7 @@ int main (int argc, const char * argv[])
 		exit(EX_USAGE);
     }
 	
-	(char *)src = (char *)argv[optind];
+	src = (char *)argv[optind];
 
 	//get the icon
 	srcPath = [NSString stringWithCString: src];

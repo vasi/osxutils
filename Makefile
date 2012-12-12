@@ -1,4 +1,3 @@
-CC = gcc
 OPT = -O0 -g
 ARCH =
 MY_CFLAGS = -fpascal-strings
