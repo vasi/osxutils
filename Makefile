@@ -1,37 +1,41 @@
-NAMES_CARBON = fileinfo getfcomment hfsdata lsmac mkalias setfcomment setfctypes setfflags setlabel setsuffix
-NAMES_COCOA = geticon seticon wsupdate
-
-PROGRAMS_CARBON = $(foreach name,$(NAMES_CARBON),$(name)/$(name))
-PROGRAMS_COCOA = $(foreach name,$(NAMES_COCOA),$(name)/$(name))
-
-PROGRAMS = $(PROGRAMS_COCOA) $(PROGRAMS_CARBON)
-
 CC = gcc
 OPT = -O0 -g
+ARCH =
 MY_CFLAGS = -fpascal-strings
 WARN = -w
 
-all: $(PROGRAMS)
+
+NAMES_CARBON = fileinfo getfcomment hfsdata lsmac mkalias setfcomment setfctypes setfflags setlabel setsuffix
+NAMES_COCOA = geticon seticon wsupdate
+NAMES = $(NAMES_CARBON) $(NAMES_COCOA)
+PROGRAMS = $(foreach name,$(NAMES),$(name)/$(name))
+
+
+all: $(NAMES)
 
 clean:
 	find . -name '*.o' -exec rm {} \+
 	rm -f $(PROGRAMS)
 
-.PHONY: all clean
+.PHONY: all clean $(NAMES)
 
+
+ARCH_FLAG = $(if $(ARCH),-arch $(ARCH),)
+COMPILER = $(CC) $(ARCH_FLAG) $(OPT) $(WARN)
+COMPILE = $(COMPILER) $(MY_CFLAGS) $(CFLAGS)
 
 %.o: %.c
-	$(CC) $(OPT) $(WARN) $(MY_CFLAGS) $(CFLAGS) -c -o $@ $<
+	$(COMPILE) -c -o $@ $<
 %.o: %.m
-	$(CC) $(OPT) $(WARN) $(MY_CFLAGS) $(CFLAGS) -c -o $@ $<
+	$(COMPILE) -c -o $@ $<
 
+F_OBJFILES = $(patsubst %.c,%.o,$(patsubst %.m,%.o,$(wildcard $(1)/*.[cm])))
 
-OBJFILES = $(patsubst %.c,%.o,$(patsubst %.m,%.o,$(wildcard $(1)/*.[cm])))
-
-define TEMPLATE
-$(1)/$(1): $(call OBJFILES,$(1))
-	$(CC) $(OPT) $(WARN) -o $$@ -framework $(2) $$^
+define TEMPL_CC
+$(1)/$(1): $(call F_OBJFILES,$(1))
+	$(COMPILER) $(LDFLAGS) -o $$@ -framework $(2) $$^
 endef
 
-$(foreach name,$(NAMES_CARBON),$(eval $(call TEMPLATE,$(name),Carbon)))
-$(foreach name,$(NAMES_COCOA),$(eval $(call TEMPLATE,$(name),Cocoa)))
+$(foreach name,$(NAMES_CARBON),$(eval $(call TEMPL_CC,$(name),Carbon)))
+$(foreach name,$(NAMES_COCOA),$(eval $(call TEMPL_CC,$(name),Cocoa)))
+$(foreach name,$(NAMES),$(eval $(name): $(name)/$(name)))
