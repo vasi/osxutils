@@ -9,6 +9,7 @@ use File::Basename;
 use File::Spec::Functions;
 use File::Copy qw(move);
 
+my $exit = 0;
 my $trash = catfile($ENV{HOME}, '.Trash');
 foreach my $arg (@ARGV) {
    my $cnt = 1;
@@ -18,5 +19,9 @@ foreach my $arg (@ARGV) {
        $tname = catfile($trash, "$base copy $cnt");
        ++$cnt;
    }
-   move($arg, $tname);
+   unless (move($arg, $tname)) {
+	   print STDERR "Error trashing $arg: $!\n";
+	   $exit = 1;
+   }
 }
+exit $exit;
