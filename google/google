@@ -4,23 +4,27 @@
 # Search google with command line parameters
 #
 
-$numArgs = $#ARGV + 1;
+use strict;
+use warnings;
 
-$google_url = "http://www.google.com/search?q=";
-$google_img_url = "http://images.google.com/images?q=";
-$cnt = 0;
+my $google_url = "http://www.google.com/search?q=";
+my $google_img_url = "http://images.google.com/images?q=";
 
-if ($ARGV[0] eq "-i")
+# Handle image search flag
+if (@ARGV && $ARGV[0] eq "-i")
 {
     $google_url = $google_img_url;
-    $cnt = 1;
+    shift @ARGV;
 }
 
+# Print usage if no search terms given
+my $USAGE = <<EOF;
+usage: google [-i] searchword ...
+EOF
+die $USAGE unless @ARGV;
+
 # Create query string to be passed
-foreach $argnum ($cnt .. $#ARGV)
-{
-   $query_string .= "$ARGV[$argnum]+"; 
-}
+my $query_string = join '+', @ARGV;
 
 #Replace spaces with plus
 $query_string =~ s/ /\+/;
