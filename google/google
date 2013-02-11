@@ -30,4 +30,4 @@ my $query_string = join '+', @ARGV;
 $query_string =~ s/ /\+/;
 
 # Pass url to open command, which will open in default browser
-system("open '$google_url$query_string'");
+exec("open", "$google_url$query_string");
