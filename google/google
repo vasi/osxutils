@@ -4,11 +4,12 @@
 # Search google with command line parameters
 #
 
-$numArgs = $#ARGV + 1;
+use strict;
+use warnings;
 
-$google_url = "http://www.google.com/search?q=";
-$google_img_url = "http://images.google.com/images?q=";
-$cnt = 0;
+my $google_url = "http://www.google.com/search?q=";
+my $google_img_url = "http://images.google.com/images?q=";
+my $cnt = 0;
 
 if ($ARGV[0] eq "-i")
 {
@@ -17,9 +18,10 @@ if ($ARGV[0] eq "-i")
 }
 
 # Create query string to be passed
-foreach $argnum ($cnt .. $#ARGV)
+my $query_string;
+foreach my $argnum ($cnt .. $#ARGV)
 {
-   $query_string .= "$ARGV[$argnum]+"; 
+    $query_string .= "$ARGV[$argnum]+"; 
 }
 
 #Replace spaces with plus
