@@ -10,17 +10,22 @@ use warnings;
 my $google_url = "http://www.google.com/search?q=";
 my $google_img_url = "http://images.google.com/images?q=";
 
+my $USAGE = <<EOF;
+usage: google [-ih] searchword ...
+EOF
+
 # Handle image search flag
-if (@ARGV && $ARGV[0] eq "-i")
+my $opt = $ARGV[0] || '';
+if ($opt eq "-i")
 {
     $google_url = $google_img_url;
     shift @ARGV;
 }
-
+elsif ($opt eq "-h")
+{
+    die $USAGE;
+}
 # Print usage if no search terms given
-my $USAGE = <<EOF;
-usage: google [-i] searchword ...
-EOF
 die $USAGE unless @ARGV;
 
 # Create query string to be passed
