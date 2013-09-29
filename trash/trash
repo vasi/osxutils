@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 #
-# ©2003 Sveinbjorn Thordarson <sveinbt@hi.is>
+# Â© 2003 Sveinbjorn Thordarson <sveinbt@hi.is>
 # Move files to trash
 #
+
 use warnings;
 use strict;
 use File::Basename;
