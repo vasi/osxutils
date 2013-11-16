@@ -51,7 +51,7 @@
 
 /////////////////// Prototypes //////////////////
 
-static int GenerateFileFromIcon (char *src, char *dst, int kind);
+static int GenerateFileFromIcon (char *src, char *dst);
 static int GetFileKindFromString (char *str);
 static char* CutSuffix (char *name);
 static char* GetFileNameFromPath (char *name);
@@ -63,22 +63,13 @@ static void PrintVersion (void);
 #define		PROGRAM_STRING  	"geticon"
 #define		VERSION_STRING		"0.2"
 #define		AUTHOR_STRING 		"Sveinbjorn Thordarson"
-#define		OPT_STRING			"vho:t:"
-
-	//file kinds
-	#define		kInvalidKindErr -1
-	#define		kIcnsFileKind   0
-	#define		kJpegFileKind   1
-	#define		kBmpFileKind	2
-	#define		kPngFileKind	3
-	#define		kGifFileKind	4
-	#define		kTiffFileKind   5
+#define		OPT_STRING			"vho:"
 
 int main (int argc, const char * argv[]) 
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-	int				rc, optch, result, kind = kIcnsFileKind;
+	int				rc, optch, result;
 	char			*src = NULL, *dst = NULL;
 	int				alloced = TRUE;
     static char		optstring[] = OPT_STRING;
@@ -99,14 +90,6 @@ int main (int argc, const char * argv[])
                 dst = optarg;
 				alloced = FALSE;
                 break;
-			case 't':
-				kind = GetFileKindFromString(optarg);
-				if (kind == kInvalidKindErr)
-				{
-					fprintf(stderr, "%s: %s: Invalid file kind\n", PROGRAM_STRING, optarg);
-					return EX_USAGE;
-				}
-				break;
             default: // '?'
                 rc = 1;
                 PrintHelp();
@@ -130,11 +113,12 @@ int main (int argc, const char * argv[])
 	{
 		dst = malloc(2048);
 		strcpy(dst, src);
-		strcpy(dst, (char *)GetFileNameFromPath(dst));
+		char *name = GetFileNameFromPath(dst);
+		memmove(dst, name, strlen(name) + 1);
 		dst = CutSuffix(dst);
 	}
 	
-	result = GenerateFileFromIcon(src, dst, kind);
+	result = GenerateFileFromIcon(src, dst);
 	
 	if (alloced == TRUE)
 		free(dst);
@@ -143,26 +127,7 @@ int main (int argc, const char * argv[])
     return result;
 }
 
-static int GetFileKindFromString (char *str)
-{
-	if (!strcmp(str, (char *)"jpeg"))
-		return 1;
-	if (!strcmp(str, (char *)"bmp"))
-		return 2;
-	if (!strcmp(str, (char *)"png"))
-		return 3;
-	if (!strcmp(str, (char *)"gif"))
-		return 4;
-	if (!strcmp(str, (char *)"tiff"))
-		return 5;
-	if (!strcmp(str, (char *)"icns"))
-		return 0;
-		
-	
-	return kInvalidKindErr;
-}
-
-static int GenerateFileFromIcon (char *src, char *dst, int kind)
+static int GenerateFileFromIcon (char *src, char *dst)
 {
 	NSString	*srcStr = [NSString stringWithCString: src];
 	NSString	*dstStr = [NSString stringWithCString: dst];
@@ -178,52 +143,9 @@ static int GenerateFileFromIcon (char *src, char *dst, int kind)
 	
 	IconFamily  *icon = [IconFamily iconFamilyWithIconOfFile: srcStr];
 	
-	if (kind == kIcnsFileKind)
-	{
-		if (![dstStr hasSuffix: @".icns"])
-			dstStr = [dstStr stringByAppendingString:@".icns"];
-		[icon writeToFile: dstStr];
-	}
-	else if (kind == kJpegFileKind)
-	{
-		if (![dstStr hasSuffix: @".jpg"])
-			dstStr = [dstStr stringByAppendingString:@".jpg"];
-		dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-		data = [[icon bitmapImageRepWithAlphaForIconFamilyElement: kThumbnail32BitData] representationUsingType:NSJPEGFileType properties:dict];
-		[data writeToFile: dstStr atomically:YES];
-	}
-	else if (kind == kBmpFileKind)
-	{
-		if (![dstStr hasSuffix: @".bmp"])
-			dstStr = [dstStr stringByAppendingString:@".bmp"];
-		dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-		data = [[icon bitmapImageRepWithAlphaForIconFamilyElement: kThumbnail32BitData] representationUsingType:NSBMPFileType properties:dict];
-		[data writeToFile: dstStr atomically:YES];
-	}
-	else if (kind == kPngFileKind)
-	{
-		if (![dstStr hasSuffix: @".png"])
-			dstStr = [dstStr stringByAppendingString:@".png"];
-		dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-		data = [[icon bitmapImageRepWithAlphaForIconFamilyElement: kThumbnail32BitData] representationUsingType:NSPNGFileType properties:dict];
-		[data writeToFile: dstStr atomically:YES];
-	}
-	else if (kind == kGifFileKind)
-	{
-		if (![dstStr hasSuffix: @".gif"])
-			dstStr = [dstStr stringByAppendingString:@".gif"];
-		dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-		data = [[icon bitmapImageRepWithAlphaForIconFamilyElement: kThumbnail32BitData] representationUsingType:NSGIFFileType properties:dict];
-		[data writeToFile: dstStr atomically:YES];
-	}
-	else if (kind == kTiffFileKind)
-	{
-		if (![dstStr hasSuffix: @".tiff"])
-			dstStr = [dstStr stringByAppendingString:@".tiff"];
-		dict = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-		data = [[icon bitmapImageRepWithAlphaForIconFamilyElement: kThumbnail32BitData] representationUsingType:NSTIFFFileType properties:dict];
-		[data writeToFile: dstStr atomically:YES];
-	}
+	if (![dstStr hasSuffix: @".icns"])
+		dstStr = [dstStr stringByAppendingString:@".icns"];
+	[icon writeToFile: dstStr];
 	
 	//see if file was created
 	if (![[NSFileManager defaultManager] fileExistsAtPath: dstStr])

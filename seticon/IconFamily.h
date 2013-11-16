@@ -43,10 +43,6 @@
 + (IconFamily*) iconFamily;
 + (IconFamily*) iconFamilyWithContentsOfFile:(NSString*)path;
 + (IconFamily*) iconFamilyWithIconOfFile:(NSString*)path;
-+ (IconFamily*) iconFamilyWithIconFamilyHandle:(IconFamilyHandle)hNewIconFamily;
-+ (IconFamily*) iconFamilyWithSystemIcon:(int)fourByteCode;
-+ (IconFamily*) iconFamilyWithThumbnailsOfImage:(NSImage*)image;
-+ (IconFamily*) iconFamilyWithThumbnailsOfImage:(NSImage*)image usingImageInterpolation:(NSImageInterpolation)imageInterpolation;
 
 // Initializes as a new, empty IconFamily.  This is IconFamily's designated
 // initializer method.
@@ -63,107 +59,24 @@
 
 - initWithContentsOfFile:(NSString*)path;
 
-// Initializes an IconFamily from an existing Carbon IconFamilyHandle.
-
-- initWithIconFamilyHandle:(IconFamilyHandle)hNewIconFamily;
-
 // Initializes an IconFamily by loading the Finder icon that's assigned to a
 // file.
 
 - initWithIconOfFile:(NSString*)path;
 
-// Initializes an IconFamily by referencing a standard system icon.
-
-- initWithSystemIcon:(int)fourByteCode;
-
-// Initializes an IconFamily by creating its elements from a resampled
-// NSImage.  The second form of this method allows you to specify the degree
-// of antialiasing to be used in resampling the image, by passing in one of
-// the NSImageInterpolation... constants that are defined in
-// NSGraphicsContext.h.  The first form of this initializer simply calls the
-// second form with imageInterpolation set to NSImageInterpolationHigh, which
-// produces highly smoothed thumbnails.
-
-- initWithThumbnailsOfImage:(NSImage*)image;
-- initWithThumbnailsOfImage:(NSImage*)image usingImageInterpolation:(NSImageInterpolation)imageInterpolation;
-
 // Writes the icon family to an .icns file.
 
 - (BOOL) writeToFile:(NSString*)path;
-
-// Sets the image data for one of the icon family's elements from an
-// NSBitmapImageRep.  The "elementType" parameter must be one of the icon
-// family element types listed below, and the format of the "bitmapImageRep"
-// must match the corresponding requirements specified below.  Regardless of
-// the elementType, the bitmapImageRep must also be non-planar and have 8 bits
-// per sample.
-//
-//  elementType           dimensions   format
-//  -------------------   ----------   ---------------------------------------
-//  kThumbnail32BitData    128 x 128   32-bit RGBA, 32-bit RGB, or 24-bit RGB
-//  kThumbnail8BitMask     128 x 128   32-bit RGBA or 8-bit intensity
-//  kLarge32BitData         32 x  32   32-bit RGBA, 32-bit RGB, or 24-bit RGB
-//  kLarge8BitMask          32 x  32   32-bit RGBA or 8-bit intensity
-//  kLarge1BitMask          32 x  32   32-bit RGBA, 8-bit intensity, or 1-bit
-//  kSmall32BitData         16 x  16   32-bit RGBA, 32-bit RGB, or 24-bit RGB
-//  kSmall8BitMask          16 x  16   32-bit RGBA or 8-bit intensity
-//  kSmall1BitMask          16 x  16   32-bit RGBA, 8-bit intensity, or 1-bit
-//
-// When an RGBA image is supplied to set a "Mask" element, the mask data is
-// taken from the image's alpha channel.
-//
-// NOTE: Setting an IconFamily's kLarge1BitMask seems to damage the IconFamily
-//       for some as yet unknown reason.  (If you then assign the icon family
-//       as a file's custom icon using -setAsCustomIconForFile:, the custom
-//       icon doesn't appear for the file in the Finder.)  However, both
-//	 custom icon display and mouse-click hit-testing in the Finder seem to
-//       work fine when we only set the other four elements (thus keeping the
-//       existing kLarge1BitMask from the valid icon family from which we
-//       initialized the IconFamily via -initWithContentsOfFile:, since
-//       IconFamily's -init method is currently broken...), so it seems safe
-//       to just leave the kLarge1BitMask alone.
-
-- (BOOL) setIconFamilyElement:(OSType)elementType
-           fromBitmapImageRep:(NSBitmapImageRep*)bitmapImageRep;
-
-// Gets the image data for one of the icon family's elements as a new, 32-bit
-// RGBA NSBitmapImageRep.  The specified elementType should be one of
-// kThumbnail32BitData, kLarge32BitData, or kSmall32BitData.
-//
-// The returned NSBitmapImageRep will have the corresponding 8-bit mask data
-// in its alpha channel, or a fully opaque alpha channel if the icon family
-// has no 8-bit mask data for the specified alpha channel.
-//
-// Returns nil if the requested element cannot be retrieved (e.g. if the
-// icon family has no such 32BitData element).
-
-- (NSBitmapImageRep*) bitmapImageRepWithAlphaForIconFamilyElement:(OSType)elementType;
-
-// Creates and returns an NSImage that contains the icon family's various
-// elements as its NSImageReps.
-
-- (NSImage*) imageWithAllReps;
-
-// NOTE: Planned method -- not yet implemented.
-//
-// Gets the image data for one of the icon family's elements as a new
-// NSBitmapImageRep.  The specified elementType should be one of
-// kThumbnail32BitData, kThumbnail32BitMask, kLarge32BitData, kLarge8BitMask,
-// kLarge1BitMask, kSmall32BitData, kSmall8BitMask, or kSmall1BitMask.
-
-// - (NSBitmapImageRep*) bitmapImageRepForIconFamilyElement:(OSType)elementType;
 
 // Writes the icon family to the resource fork of the specified file as its
 // kCustomIconResource, and sets the necessary Finder bits so the icon will
 // be displayed for the file in Finder views.
 
 - (BOOL) setAsCustomIconForFile:(NSString*)path;
-- (BOOL) setAsCustomIconForFile:(NSString*)path withCompatibility:(BOOL)compat;
 
 // Same as the -setAsCustomIconForFile:... methods, but for folders (directories).
 
 - (BOOL) setAsCustomIconForDirectory:(NSString*)path;
-- (BOOL) setAsCustomIconForDirectory:(NSString*)path withCompatibility:(BOOL)compat;
 
 // Removes the custom icon (if any) from the specified file's resource fork,
 // and clears the necessary Finder bits for the file.  (Note that this is a
@@ -171,13 +84,4 @@
 
 + (BOOL) removeCustomIconFromFile:(NSString*)path;
 
-@end
-
-// Methods for interfacing with the Carbon Scrap Manager (analogous to and
-// interoperable with the Cocoa Pasteboard).
-@interface IconFamily (ScrapAdditions)
-+ (BOOL) canInitWithScrap;
-+ (IconFamily*) iconFamilyWithScrap;
-- initWithScrap;
-- (BOOL) putOnScrap;
 @end

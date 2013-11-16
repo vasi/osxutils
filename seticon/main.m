@@ -40,7 +40,6 @@
 #define		VERSION_STRING		"0.2"
 #define		AUTHOR_STRING 		"Sveinbjorn Thordarson"
 #define		OPT_STRING			"vhd" 
-//"vhdi"
 
 static int UnixIsFolder (char *path);
 static void PrintVersion (void);
@@ -50,7 +49,7 @@ int main (int argc, const char * argv[])
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-	int				rc, optch, sourceIsIcns = 0, sourceIsImage = 0;
+	int				rc, optch, sourceIsIcns = 0;
 	char			*src;
     static char		optstring[] = OPT_STRING;
 	IconFamily		*icon;
@@ -72,23 +71,13 @@ int main (int argc, const char * argv[])
             case 'd':
 				sourceIsIcns = 1;
 				break;
-			/*case 'i':
-				sourceIsImage = 1;
-				break;*/
-            default: // '?'
+				default: // '?'
                 rc = 1;
                 PrintHelp();
                 exit(EX_USAGE);
         }
     }
 	
-	if (sourceIsIcns && sourceIsImage)
-	{
-		fprintf(stderr, "%s: Both -i and -d parameters specified.\nSource cannot both be icns and image", PROGRAM_STRING);
-        PrintHelp();
-        exit(EX_USAGE);
-	}
-
 	//check if a correct number of arguments was submitted
     if (argc < 3)
     {
@@ -103,12 +92,6 @@ int main (int argc, const char * argv[])
 	srcPath = [NSString stringWithCString: src];
 	if (sourceIsIcns)
 		icon = [IconFamily iconFamilyWithContentsOfFile: srcPath];
-	/*else if (sourceIsImage)
-	{
-		image = [[NSImage alloc] initWithContentsOfFile: srcPath];
-		icon = [IconFamily iconFamilyWithThumbnailsOfImage: image];
-	//	[image release];
-	}*/
 	else
 		icon = [IconFamily iconFamilyWithIconOfFile: srcPath];
 	
@@ -160,6 +143,6 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-    printf("usage: %s [-vhdi] [source] [file ...]\n", PROGRAM_STRING);
+    printf("usage: %s [-vhd] [source] [file ...]\n", PROGRAM_STRING);
 }
 
