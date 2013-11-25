@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-print "This is an verview of the 'osxutils' suite of Mac command line utilities.    The programs included in the suite are listed in alphabetical order, followed by a short description of their function.  For more detail on the functionality of individual tools, see the program man pages.\n\n";
+print "This is an overview of the 'osxutils' suite of Mac command line utilities. The programs included in the suite are listed in alphabetical order, followed by a short description of their function.  For more detail on the functionality of individual tools, see the program man pages.\n\n";
 
 print "cpath -- copies current working directory to the clipboard\n";
 print "getfcomment -- print out the Mac OS comment of a given file\n";
