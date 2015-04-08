@@ -5,6 +5,7 @@ print "This is an overview of the 'osxutils' suite of Mac command line utilities
 print "cpath        copy the current working directory to the clipboard\n";
 print "getfcomment  print a file's Spotlight comment\n";
 print "geticon      extract a file's icon as an image\n";
+print "getvolume    show the global system volume setting\n";
 print "google       search Google in default browser\n";
 print "hfsdata      print a file's HFS- or Mac-specific metadata\n";
 print "lsmac        list directory contents with OS X metadata\n";
