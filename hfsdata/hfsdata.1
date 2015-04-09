@@ -1,19 +1,19 @@
-.Dd 12/18/04               \" DATE 
-.Dt hfsdata 1      \" Program name and manual section number 
+.Dd April 9, 2015
+.Dt hfsdata 1
 .Os Darwin
-.Sh NAME                 \" Section Header - required - don't modify 
+.Sh NAME
 .Nm hfsdata
 .Nd retrieve Mac meta-data for a file or folder
-.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Sh SYNOPSIS
 .Nm
-.Op Fl vhxAcmatrRsSdDTCklLoOe              \" [-abcd]
-.Ar file                 \" Underlined argument - use .Ar anywhere to underline
-.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Op Fl vhxAcmatrRsSdDTCklLoOe
+.Ar file
+.Sh DESCRIPTION
 .Nm
 is a command line tool to get all sorts of miscellaneous HFS or Mac OS-specific
-meta-data for a given file.  You can specify the exact
-meta-data you want to be printed as output by using one of these flags:
-.Bl -tag -width -indent  \" Differs from above in tag removed 
+meta-data for a given file.  You can specify the exact meta-data you want to be
+printed as output by using one of these flags:
+.Bl -tag -width -indent
 .It Fl e
 Prints the path of the file pointed to by a given alias
 .It Fl x
@@ -58,16 +58,14 @@ Prints the file's Mac OS 9 Desktop Database comment
 Prints hfsdata program version and exits
 .It Fl h
 Prints help
-.El                      \" Ends the list
-.Pp                   
-.Sh FILES                \" File used or created by the topic of the man page
+.El
+.Pp
+.Sh FILES
 .Bl -tag -width "/usr/local/bin/hfsdata" -compact
 .It Pa /usr/local/bin/hfsdata
 .El
-.Sh SEE ALSO 
-.\" List links in ascending order by section, alphabetically within a section.
-.\" Please do not reference files that do not exist without filing a bug report
-.Xr geticon 1 , 
+.Sh SEE ALSO
+.Xr geticon 1 ,
 .Xr fileinfo 1 ,
 .Xr getfcomment 1 ,
 .Xr lsmac 1 ,
