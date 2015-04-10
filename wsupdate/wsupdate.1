@@ -6,8 +6,8 @@
 .Nd report file system change to Mac OS X
 .Sh SYNOPSIS
 .Nm
-.Ar [-vh]
-.Ar
+.Op Fl vh
+.Op Ar
 .Sh DESCRIPTION
 .Ar wsupdate
 is a simple command line tool to execute the NSWorkspace method 'noteFileSystemChanged'.  This will make the Finder update its open windows.  If no arguments are given, the system will receive a general notification.  If files are specified, these particular locations will be updated.
