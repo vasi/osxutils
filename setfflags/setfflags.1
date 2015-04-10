@@ -13,8 +13,7 @@
 .Op Fl b Ar bool
 .Op Fl i Ar bool
 .Op Fl a Ar bool
-.Ar file
-.Ar ...
+.Ar
 .Sh DESCRIPTION
 .Nm
 is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one flag to be set or unset using the following options:
@@ -42,11 +41,11 @@ Using numbers instead of string to specify the boolean value is also permitted. 
 invisibility flag and unset the custom icon flag.
 .Pp
 # setfflags -i 1 -c 0 /path/to/file
-.Pp
-If you have any questions, please direct them to Sveinbjorn Thordarson <sveinbt@hi.is>.
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfflags" -compact
 .It Pa /usr/local/bin/setfflags
+.Sh AUTHOR
+Originally written by Sveinbjorn Thordarson <sveinbjornt@gmail.com>.
 .Sh SEE ALSO
 .Xr SetFile 1 ,
 .Xr GetFileInfo 1 ,
