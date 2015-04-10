@@ -8,16 +8,16 @@
 .Nm
 .Op Fl vhns
 .Op Fl c comment
-.Ar file ...
+.Ar
 .Sh DESCRIPTION
 .Ar setfcomment
 is a utility for setting MacOS Finder comments of files and folders.  This is done
 by sending the MacOS X Finder the appropriate type of Apple Event, or if MacOS 9
 Finder comment setting is enabled, by modifying the Desktop Database file using
 File Manager APIs.  Typical usage would be:
-.Bl -tag -width -indent
-.It setfcomment -c 'This is my comment' myfile.txt
-.El
+.Pp
+.Dl setfcomment -c 'This is my comment' myfile.txt
+.Pp
 .Pp
 The following options are supported:
 .Pp

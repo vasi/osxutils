@@ -35,12 +35,13 @@ Is Alias
 The specification of each of the above must be followed by a boolean value, i.e. "true"/"false" or 1/0.
 Here's an example of typical usage.  Let's say we want to set a file's Invisibility flag:
 .Pp
-# setfflags -i true /path/to/file
+.Dl setfflags -i true /path/to/file
 .Pp
 Using numbers instead of string to specify the boolean value is also permitted.  Here we set the
 invisibility flag and unset the custom icon flag.
 .Pp
-# setfflags -i 1 -c 0 /path/to/file
+.Dl setfflags -i 1 -c 0 /path/to/file
+.Pp
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfflags" -compact
 .It Pa /usr/local/bin/setfflags
