@@ -2,8 +2,8 @@
 
 if ($ARGV[0] =~ m/-\w*h/)
 {
-	printf("Usage: getvolume\n");
-	exit(64);
+  printf("Usage: getvolume\n");
+  exit(64);
 }
 
 system("/usr/bin/osascript -e 'output volume of (get volume settings)'");

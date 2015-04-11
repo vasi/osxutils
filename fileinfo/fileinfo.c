@@ -17,19 +17,10 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/*
-  Version History
+/*  TODO
 
-  Version 0.1 - fileinfo released despite bugs, flaws, shortcomings, etc
-*/
-
-/*  Todo
-
-  * Clean up the messy code
-  * Fix a lot of loose ends
-  * Serious error checking
+  * Error checking
   * Finder comment retrieval
-  * Bugs, bugs, bugs
 */
 
 #include <stdio.h>
@@ -127,13 +118,9 @@ OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTime
 static short GetLabelNumber (short flags);
 void OSTypeToStr (OSType aType, char *aStr);
 
-/*//////////////////////////////////////
-// Main program function
-/////////////////////////////////////*/
 int main (int argc, char *argv[])
 {
   int         i;
-  int         rc;
   int         optch;
   static char optstring[] = OPT_STRING;
 
@@ -144,13 +131,7 @@ int main (int argc, char *argv[])
       case 'v':
         PrintVersion();
         return 0;
-        break;
       case 'h':
-        PrintHelp();
-        return 0;
-        break;
-      default: /* '?' */
-        rc = 1;
         PrintHelp();
         return 0;
     }
@@ -159,24 +140,13 @@ int main (int argc, char *argv[])
   for (; optind < argc; ++optind)
     PrintFileInfo( argv[optind] );
 
-  return(0);
+  return 0;
 }
-
-#pragma mark -
-
-
-/*//////////////////////////////////////
-// Print version and author to stdout
-/////////////////////////////////////*/
 
 static void PrintVersion (void)
 {
   printf("%s version %s by %s\n", PROGRAM_STRING, VERSION_STRING, AUTHOR_STRING);
 }
-
-/*//////////////////////////////////////
-// Print help string to stdout
-/////////////////////////////////////*/
 
 static void PrintHelp (void)
 {
@@ -395,8 +365,6 @@ OSErr ProcessFinderInfo (FileInfoStruct *file)
   return noErr;
 }
 
-#pragma mark -
-
 /*//////////////////////////////////////
 // Check if file in designated path is folder
 /////////////////////////////////////*/
@@ -409,7 +377,7 @@ static int UnixIsFolder (char *path)
   if (err == -1)
     return err;
 
-  return (S_ISREG(filestat.st_mode) != 1);
+  return S_ISREG(filestat.st_mode) != 1;
 }
 
 static int UnixIsSymlink (char *path)
@@ -492,7 +460,7 @@ static char* GetPathOfAliasSource (char *path)
     return NULL;
   }
 
-  return ((char *)&srcPath);
+  return (char *)&srcPath;
 }
 
 /*//////////////////////////////////////
@@ -500,11 +468,7 @@ static char* GetPathOfAliasSource (char *path)
 /////////////////////////////////////*/
 static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize)
 {
-  OSStatus result;
-
-  result = FSRefMakePath(&fileRef, path, 1024);
-
-  return result;
+  return FSRefMakePath(&fileRef, path, 1024);
 }
 
 /*

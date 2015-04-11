@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 #
 # © 2003 Sveinbjorn Thordarson <sveinbt@hi.is>
+#
 # Search google with command line parameters
 #
 
@@ -18,12 +19,12 @@ EOF
 my $opt = $ARGV[0] || '';
 if ($opt eq "-i")
 {
-    $google_url = $google_img_url;
-    shift @ARGV;
+  $google_url = $google_img_url;
+  shift @ARGV;
 }
 elsif ($opt eq "-h")
 {
-    die $USAGE;
+  die $USAGE;
 }
 # Print usage if no search terms given
 die $USAGE unless @ARGV;
