@@ -8,7 +8,7 @@
 .Nm
 .Op Fl vhsefar
 .Op Fl l Ar length
-.Op Fl x Ar suffix
+.Fl x Ar suffix
 .Ar
 .Sh DESCRIPTION
 .Nm
@@ -17,11 +17,11 @@ files and determine what application to employ when opening them.
 .Pp
 .Nm
 accepts the following options:
-.Bl -tag -width -indent
-.It Fl x [suffix]
-Use the -x option to specify the suffix you want added, without the leading dot (".")
-.It Fl l [length]
-Sets the max number of characters that can constitute a valid suffix.
+.Bl -tag -width indent
+.It Fl x Ar suffix
+Specify the suffix you want added, without the leading dot (".")
+.It Fl l Ar length
+Set the max number of characters that can constitute a valid suffix.
 .Nm
 defaults to 4, so without this specification it will ignore all suffixes longer than 4 characters.
 .It Fl s
@@ -31,9 +31,13 @@ Ignore files that already have a suffix.
 .It Fl f
 Ignore folders.
 .It Fl a
-Instead of replacing previous file suffix, add it.
+Append the new suffix instead of replacing the old one.
 .It Fl r
 Remove file suffix.  If this option is specified, all other options apart from -l are ignored.
+.It Fl v
+Print version and exit.
+.It Fl h
+Print usage and exit.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setsuffix" -compact

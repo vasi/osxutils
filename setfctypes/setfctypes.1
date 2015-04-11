@@ -7,11 +7,11 @@
 .Sh SYNOPSIS
 .Nm
 .Op Fl vhs
-.Op Fl f filetype
-.Op Fl c creator
+.Op Fl f Ar filetype
+.Op Fl c Ar creator
 .Ar
 .Sh DESCRIPTION
-.Ar setfctypes
+.Nm
 is a utility for setting the heritage MacOS File Type and Creator Type of files.  It's very simple to use and is about
 twice as fast as Apple's SetFile(1) command.  An example of typical usage would be:
 .Pp
@@ -19,20 +19,20 @@ twice as fast as Apple's SetFile(1) command.  An example of typical usage would 
 .Pp
 It is not neccesary to specify both the -f and -c options.
 .Pp
-.Ar setfctypes
+.Nm
 accepts the following options:
 .Pp
 .Bl -tag -width indent
 .It Fl v
-Print version and author and then exit.
+Print version and exit.
 .It Fl h
-Print help.
+Print usage and exit.
 .It Fl s
 Silent mode.  No errors or problems are reported.
-.It Fl c
-Followed by a four character string specifying Creator type.
-.It Fl f
-Followed by a four character string specifying File type.
+.It Fl c Ar creator
+Specify four character Creator type.
+.It Fl f Ar filetype
+Specify four character File type.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfctypes" -compact

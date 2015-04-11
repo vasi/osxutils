@@ -10,7 +10,7 @@
 .Ar label
 .Ar
 .Sh DESCRIPTION
-.Ar setlabel
+.Nm
 is a utility for setting the MacOS Finder label of files and folders.  This is done
 by modifying the meta-data flag fields in the HFS file record.  The available labels
 (case sensitive) are:
@@ -25,11 +25,11 @@ The following options are supported:
 .Pp
 .Bl -tag -width indent
 .It Fl v
-Prints version and author and then exits
+Print version and exit.
 .It Fl h
-Prints help
+Print usage and exit.
 .It Fl s
-Silent mode.  No output list or error reports are printed.
+Silent mode.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setlabel" -compact
