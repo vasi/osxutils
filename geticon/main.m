@@ -36,7 +36,6 @@
 #include <sysexits.h>
 
 static int GenerateFileFromIcon (char *src, char *dst);
-static int GetFileKindFromString (char *str);
 static char* CutSuffix (char *name);
 static char* GetFileNameFromPath (char *name);
 static void PrintHelp (void);
@@ -173,5 +172,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vh] [-t [icns|png|gif|tiff|jpeg]] [-o outputfile] file\n", PROGRAM_STRING);
+  printf("usage: %s [-vh] [-o outputfile] file\n", PROGRAM_STRING);
 }
