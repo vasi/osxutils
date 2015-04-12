@@ -254,8 +254,17 @@ static char* GetSuffixStringFromArgument (char *arg)
   static char suffix[MAX_SUFFIX_LENGTH];
   short       len = strlen(arg);
 
-  // Check whether length of the new suffix is valid
-  if (len > MAX_SUFFIX_LENGTH)
+  if (len == 0)
+  {
+    removeSuffix = 1;
+  }
+  else if (suffix[0] == '.')
+  {
+    fprintf(stderr,"You don't need to write the preceding dot when specifying suffix.\n");
+    PrintHelp();
+    exit(EX_USAGE);
+  }
+  else if (len > MAX_SUFFIX_LENGTH)
   {
     fprintf(stderr,"Suffix \"%s\" is too long. setsuffix handles a max suffix length of 10 characters.\n", arg);
     PrintHelp();
@@ -266,20 +275,6 @@ static char* GetSuffixStringFromArgument (char *arg)
     fprintf(stderr,"Suffix \"%s\" is too long.  Specify a longer max suffix length with the -l option.\n", arg);
     PrintHelp();
     exit(EX_DATAERR);
-  }
-  if (len <= 0)
-  {
-    fprintf(stderr,"Please specify a suffix of at least 1 character.\n");
-    PrintHelp();
-    exit(EX_USAGE);
-  }
-
-  // Check if user made the error of including the dot '.'
-  if (suffix[0] == '.')
-  {
-    fprintf(stderr,"You don't need to write the preceding dot when specifying suffix.\n");
-    PrintHelp();
-    exit(EX_USAGE);
   }
 
   strcpy((char *)&suffix, arg);

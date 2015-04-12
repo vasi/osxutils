@@ -19,7 +19,9 @@ files and determine what application to employ when opening them.
 accepts the following options:
 .Bl -tag -width indent
 .It Fl x Ar suffix
-Specify the suffix you want added, without the leading dot (".")
+Specify the suffix you want added, without the leading dot (".").  Specifying an empty string is the same as using the
+.Fl r
+option.
 .It Fl l Ar length
 Set the max number of characters that can constitute a valid suffix.
 .Nm
