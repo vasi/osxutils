@@ -17,18 +17,22 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/*  CHANGES
+/*
+  CHANGES
 
-  0.2 - Fixed all compiler warnings, removed Carbon dependency, syexits.h for program exit codes
-  0.1 - First release of setsuffix
+  0.2
+    * Fixed all compiler warnings, removed Carbon dependency, syexits.h for program exit codes
+
+  0.1
+    * First release of setsuffix
 */
 
-/*  TODO
+/*
+  TODO
 
   * Find out how Apple stores the "Hide Extension" file meta-data set in Get info and enable setsuffix to modify it
   * Add suffix matching specification (something like "all files with suffix a get suffix b")
   * Recursively scan through folder hierarchies option (although this can, of course, be done by combining 'setsuffix' with 'find')
-  * Suggestions are welcome...
 */
 
 #include <stdio.h>
@@ -104,7 +108,7 @@ int main (int argc, const char * argv[])
 
   if (!removeSuffix && suffix == NULL)
   {
-    fprintf(stderr, "You must specify the suffix to be set using the -x option.\n");
+    fprintf(stderr, "Please specify the suffix you'd like to set using the -x flag.\n");
     PrintHelp();
     return EX_USAGE;
   }
