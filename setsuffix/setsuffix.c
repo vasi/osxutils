@@ -254,32 +254,32 @@ static char* GetSuffixStringFromArgument (char *arg)
   static char suffix[MAX_SUFFIX_LENGTH];
   short       len = strlen(arg);
 
-  // Check if suffix string specified is of valid length
+  // Check whether length of the new suffix is valid
   if (len > MAX_SUFFIX_LENGTH)
   {
     fprintf(stderr,"Suffix \"%s\" is too long. setsuffix handles a max suffix length of 10 characters.\n", arg);
     PrintHelp();
-    return((char *)EX_DATAERR);
+    exit(EX_DATAERR);
   }
   else if (len > suffixMaxLength)
   {
     fprintf(stderr,"Suffix \"%s\" is too long.  Specify a longer max suffix length with the -l option.\n", arg);
     PrintHelp();
-    return((char *)EX_DATAERR);
+    exit(EX_DATAERR);
   }
   if (len <= 0)
   {
     fprintf(stderr,"Please specify a suffix of at least 1 character.\n");
     PrintHelp();
-    return((char *)EX_USAGE);
+    exit(EX_USAGE);
   }
 
-  //check if user made the error of including the dot '.'
+  // Check if user made the error of including the dot '.'
   if (suffix[0] == '.')
   {
     fprintf(stderr,"You don't need to write the preceding dot when specifying suffix.\n");
     PrintHelp();
-    return((char *)EX_USAGE);
+    exit(EX_USAGE);
   }
 
   strcpy((char *)&suffix, arg);
@@ -305,14 +305,14 @@ static short GetSuffixMaxLength (char *strArg)
   {
     printf("%s: Invalid length specified\n", strArg);
     PrintHelp();
-    return(EX_USAGE);
+    exit(EX_USAGE);
   }
 
   if (num > MAX_SUFFIX_LENGTH)
   {
     printf("%s: Length cannot exceed %d\n", strArg, MAX_SUFFIX_LENGTH);
     PrintHelp();
-    return(EX_USAGE);
+    exit(EX_USAGE);
   }
 
   return num;
@@ -330,10 +330,7 @@ static short UnixIsFolder (char *path)
   if (err == -1)
     return err;
 
-  if(S_ISREG(filestat.st_mode) != 1)
-    return 1;
-
-  return 0;
+  return (S_ISREG(filestat.st_mode) != 1) ? 1 : 0;
 }
 
 static void PrintVersion (void)
