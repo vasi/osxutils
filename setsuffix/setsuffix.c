@@ -339,5 +339,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vhsefar] [-l length] [-x suffix] [file ...]\n", PROGRAM_STRING);
+  printf("usage: %s [-vhsefar] [-l length] -x suffix file ...\n", PROGRAM_STRING);
 }

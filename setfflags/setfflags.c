@@ -1,5 +1,6 @@
 /*
     setfflags - program to set Mac Finder flags of files
+
     Copyright (C) 2003-2005 Sveinbjorn Thordarson <sveinbt@hi.is>
 
     This program is free software; you can redistribute it and/or modify
@@ -15,36 +16,14 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
 */
 
 /*  CHANGES
-    
+
     0.1 - First release of setfflags
     0.2 - Updated to support folders
 	0.3 - Code cleaned, sysexits.h constants used for exit values, errors go to stderr
-
 */
-
-/*
-    Command line options
-
-    v - version
-    h - help - usage
-    m - silent mode
-    p - print flags
-    
-    // flag options
-
-        c - has custom icon
-        s - stationery
-        l - name locked
-        b - has bundle
-        i - is invisible
-        a - is alias
-    
-*/
-
 
 #include <stdio.h>
 #include <unistd.h>
@@ -54,15 +33,11 @@
 #include <string.h>
 #include <sysexits.h>
 
-/////////////////// Definitions //////////////////
-
 #define PROGRAM_STRING  "setfflags"
 #define VERSION_STRING  "0.3"
 #define AUTHOR_STRING   "Sveinbjorn Thordarson"
 
 #define OPT_STRING      "mpvhc:s:l:b:i:a:"
-
-/////////////////// Prototypes //////////////////
 
 static int SetFlags(char *fileStr);
 static int PrintFlags(char *fileStr);
@@ -71,9 +46,7 @@ static Boolean GetBooleanParameter(char *str);
 static void PrintVersion(void);
 static void PrintHelp(void);
 
-/////////////////// Globals //////////////////
-
-enum 
+enum
 {
     kDoCustomIcon = 0,
     kDoStationery,
@@ -84,7 +57,7 @@ enum
     kLastFinderFlag
 };
 
-enum 
+enum
 {
     kDoCustomIconBit = 1 << kDoCustomIcon,
     kDoStationeryBit = 1 << kDoStationery,
@@ -94,7 +67,7 @@ enum
     kDoIsAliasBit = 1 << kDoIsAlias
 };
 
-static const UInt16 kFinderFlags[] = 
+static const UInt16 kFinderFlags[] =
 {
     kHasCustomIcon,
     kIsStationery,
@@ -104,7 +77,7 @@ static const UInt16 kFinderFlags[] =
     kIsAlias
 };
 
-static const UInt16 kFolderOnlyFlags[] = 
+static const UInt16 kFolderOnlyFlags[] =
 {
     kHasCustomIcon,
     0,
@@ -114,7 +87,7 @@ static const UInt16 kFolderOnlyFlags[] =
     0
 };
 
-static const char *kFinderStrings[] = 
+static const char *kFinderStrings[] =
 {
     "kHasCustomIcon",
     "kIsStationery",
@@ -129,9 +102,6 @@ static short   printFlags;
 static UInt16  sCustomFlags;
 static UInt16  sCustomMask;
 
-////////////////////////////////////////////
-// main program function
-////////////////////////////////////////////
 int main (int argc, const char * argv[])
 {
     int            err = EX_OK;
@@ -143,9 +113,9 @@ int main (int argc, const char * argv[])
     sCustomFlags = 0;
     sCustomMask = 0;
 
-    while ( (optch = getopt(argc, (char * const *)argv, optstring)) != -1) 
+    while ( (optch = getopt(argc, (char * const *)argv, optstring)) != -1)
 	{
-        switch (optch) 
+        switch (optch)
 		{
             case 'm':
                 silentMode = true;
@@ -196,15 +166,15 @@ int main (int argc, const char * argv[])
                 return 0;
         }
     }
-    
+
     // if there are no types specifed and we're not printing the flags, print help and exit
-    if (!sCustomMask && !printFlags) 
+    if (!sCustomMask && !printFlags)
 	{
         PrintHelp();
         return EX_USAGE;
     }
 
-    if (sCustomMask && printFlags) 
+    if (sCustomMask && printFlags)
 	{
         fprintf(stderr, "Incompatible options.\n");
         PrintHelp();
@@ -212,20 +182,16 @@ int main (int argc, const char * argv[])
     }
 
     // all remaining arguments should be files
-    for (; optind < argc && !err; ++optind) 
+    for (; optind < argc && !err; ++optind)
 	{
         if (printFlags)
             err = PrintFlags((char *)argv[optind]);
         else
             err = SetFlags((char *)argv[optind]);
     }
-    
+
     return err;
 }
-
-
-
-#pragma mark -
 
 ////////////////////////////////////////////
 // Use Carbon functions to actually set the
@@ -243,7 +209,7 @@ static int SetFlags (char *fileStr)
     UInt16           finderFlags;
 
     // see if the file in question exists and we can write it
-    if (access(fileStr, R_OK|W_OK|F_OK) == -1) 
+    if (access(fileStr, R_OK|W_OK|F_OK) == -1)
 	{
         if (!silentMode)
             perror(fileStr);
@@ -252,7 +218,7 @@ static int SetFlags (char *fileStr)
 
     // check if it's a folder
     i = UnixIsFolder(fileStr);
-    if (i == -1) 
+    if (i == -1)
 	{
         if (!silentMode)
             fprintf(stderr, "UnixIsFolder: Error %d for file %s\n", errno, fileStr);
@@ -263,7 +229,7 @@ static int SetFlags (char *fileStr)
     pFlags = (i == 1) ? kFolderOnlyFlags : kFinderFlags;
 
     // get file reference from path
-    if ((err = FSPathMakeRef(fileStr, &fileRef, NULL)) != noErr) 
+    if ((err = FSPathMakeRef(fileStr, &fileRef, NULL)) != noErr)
 	{
         if (!silentMode)
             fprintf(stderr, "FSPathMakeRef: Error %d for file %s\n", err, fileStr);
@@ -271,7 +237,7 @@ static int SetFlags (char *fileStr)
     }
 
     // retrieve finder info from file ref
-    if ((err = FSGetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &catalogInfo, NULL, NULL, NULL)) != noErr) 
+    if ((err = FSGetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &catalogInfo, NULL, NULL, NULL)) != noErr)
 	{
         if (!silentMode)
             fprintf(stderr, "FSGetCatalogInfo(): Error %d getting Finder info for %s\n", err, fileStr);
@@ -282,18 +248,18 @@ static int SetFlags (char *fileStr)
     finderFlags = fInfo->fdFlags;
 
     // Modify the finder flags structure
-    for (i = 0; i < kLastFinderFlag; ++i) 
+    for (i = 0; i < kLastFinderFlag; ++i)
 	{
-        if ((sCustomMask & (1 << i))) 
+        if ((sCustomMask & (1 << i)))
 		{
-            if (pFlags[i]) 
+            if (pFlags[i])
 			{
                 if ((sCustomFlags & (1 << i)))
                     finderFlags |= pFlags[i];
                 else
                     finderFlags &= ~pFlags[i];
-            } 
-			else 
+            }
+			else
 			{
                 if (!silentMode)
                     fprintf(stderr, "Unsupported flag %s for %s\n", kFinderStrings[i], fileStr);
@@ -307,7 +273,7 @@ static int SetFlags (char *fileStr)
     if (fInfo->fdFlags != finderFlags)
 	{
         fInfo->fdFlags = finderFlags;
-        if ((err = FSSetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &catalogInfo)) != noErr) 
+        if ((err = FSSetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &catalogInfo)) != noErr)
 		{
             if (!silentMode)
                 fprintf(stderr, "FSSetCatalogInfo(): Error %d setting Finder info for %s\n", err, fileStr);
@@ -327,7 +293,7 @@ static int PrintFlags (char *fileStr)
     FInfo            *fInfo;
 
     //see if the file in question exists and we can read it
-    if (access(fileStr, R_OK|F_OK) == -1) 
+    if (access(fileStr, R_OK|F_OK) == -1)
 	{
         if (!silentMode)
             perror(fileStr);
@@ -336,7 +302,7 @@ static int PrintFlags (char *fileStr)
 
     //check if it's a folder
     i = UnixIsFolder(fileStr);
-    if (i == -1) 
+    if (i == -1)
 	{
         if (!silentMode)
             fprintf(stderr, "UnixIsFolder: Error %d for file %s\n", errno, fileStr);
@@ -348,16 +314,16 @@ static int PrintFlags (char *fileStr)
 
     //get file reference from path
     err = FSPathMakeRef(fileStr, &fileRef, NULL);
-    if (err != noErr) 
+    if (err != noErr)
 	{
         if (!silentMode)
             fprintf(stderr, "FSPathMakeRef: Error %d for file %s\n", err, fileStr);
         return EX_IOERR;
     }
-    
+
     //retrieve finder info from file ref
     err = FSGetCatalogInfo(&fileRef, kFSCatInfoFinderInfo, &catalogInfo, NULL, NULL, NULL);
-    if (err != noErr) 
+    if (err != noErr)
 	{
         if (!silentMode)
             fprintf(stderr, "FSGetCatalogInfo(): Error %d getting Finder info for %s\n", err, fileStr);
@@ -372,13 +338,10 @@ static int PrintFlags (char *fileStr)
     for (i = 0; i < kLastFinderFlag; ++i)
         if ( pFlags[i] )
             printf("%22s - %s", kFinderStrings[i], (fInfo->fdFlags & pFlags[i]) != 0 ? "On\n" : "Off\n");
-        
+
     printf("\n");
     return EX_OK;
 }
-
-
-#pragma mark -
 
 ////////////////////////////////////////
 // Check if file in designated path is folder
@@ -387,34 +350,31 @@ static short UnixIsFolder (char *path)
 {
     struct stat  filestat;
     short        err;
-    
+
     err = stat(path, &filestat);
     if (err == -1)
         return err;
 
     if(S_ISREG(filestat.st_mode) != 1)
         return true;
-    else 
+    else
         return false;
 }
-
-#pragma mark -
 
 ////////////////////////////////////////////
 // Get boolean value from string argument
 // Can be specified as 0, 1, false or true
 ////////////////////////////////////////////
-
 static Boolean GetBooleanParameter (char *str)
 {
     char     numStr[2];
     short    num;
-    
+
     if (!strcmp(str, "true"))
         return true;
     if (!strcmp(str, "false"))
         return false;
-    
+
     if (strlen(str) != 1)
     {
         fprintf(stderr, "%s: Invalid parameter for option.\n", str);
@@ -423,33 +383,23 @@ static Boolean GetBooleanParameter (char *str)
 
     strcpy(numStr, str);
     num = atoi(numStr);
-    
+
 	if (num != 0 && num != 1)
     {
         fprintf(stderr, "%d: Invalid parameter for option.\n", num);
         exit(EX_USAGE);
     }
-    
+
     return num;
 }
-
-#pragma mark -
-
-////////////////////////////////////////
-// Print version and author to stdout
-///////////////////////////////////////
 
 static void PrintVersion (void)
 {
     printf("%s version %s by %s\n", PROGRAM_STRING, VERSION_STRING, AUTHOR_STRING);
 }
 
-////////////////////////////////////////
-// Print help string to stdout
-///////////////////////////////////////
-
 static void PrintHelp (void)
 {
-    printf("usage: %s [-mvh] [-c bool] [-s bool] [-i bool] [-l bool] [-b bool] [-a bool] [file ...]\n", PROGRAM_STRING);
-    printf("   or: %s [-p] [file ...]\n", PROGRAM_STRING);
+    printf("usage: %s [-mvh] [-c bool] [-s bool] [-i bool] [-l bool] [-b bool] [-a bool] file ...\n", PROGRAM_STRING);
+    printf("   or: %s [-p] file ...\n", PROGRAM_STRING);
 }

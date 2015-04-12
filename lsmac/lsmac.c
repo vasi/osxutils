@@ -1,8 +1,10 @@
 /*
   lsmac - ls-like utility for viewing Mac OS file meta-data
-  Copyright (C) 2003-2005   Sveinbjorn Thordarson <sveinbt@hi.is>
-              Ingmar J. Stein <stein@xtramind.com>
-              Jean-Luc Dubois
+
+  Copyright (C) 2003-2005
+    Sveinbjorn Thordarson <sveinbt@hi.is>
+    Ingmar J. Stein <stein@xtramind.com>
+    Jean-Luc Dubois
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,12 +23,13 @@
 
 /*
 // I wrote this program because I found the Apple-supplied command line tools with the
-//  Developer Tools to be rather poor and needed a convenient way to view classic Mac file meta-data.
-//  I'd appreciate being notified of any changes/improvements made to the lsmac source code
-//  so I can add them to my own releases.  Thanks and enjoy --  Sveinbjorn Thordarson <sveinbt@.hi.is>
+// Developer Tools to be rather poor and needed a convenient way to view classic Mac file meta-data.
+// I'd appreciate being notified of any changes/improvements made to the lsmac source code
+// so I can add them to my own releases.  Thanks and enjoy --  Sveinbjorn Thordarson <sveinbt@.hi.is>
 */
 
-/*  CHANGES
+/*
+  CHANGES
 
   0.6
     * Now lists symlinks without error, thanks to Jean-Luc Dubois
@@ -69,17 +72,18 @@
     * First release of lsmac
 */
 
-/*  TODO
+/*
+  TODO
 
-    * Incorporate Ingmar J. Stein's improvements to lsmac, which should fix the following problems:
-      * Bug - errors may occur when listing folders containing more than 9999 files.
-      * Bug - Does not display size correctly for files larger than 4GB or so. 64bit int problem.
-      * Bug - When a directory parameter ends with a "/", the pathnames reported by the -p option have two slashes at the end
+  * Incorporate Ingmar J. Stein's improvements to lsmac, which should fix the following problems:
+    * Bug - errors may occur when listing folders containing more than 9999 files.
+    * Bug - Does not display size correctly for files larger than 4GB or so. 64bit int problem.
+    * Bug - When a directory parameter ends with a "/", the pathnames reported by the -p option have two slashes at the end
 
-    * Implement calculation of folder sizes - recursively scan through hierarchy and add up total size
-    * There is other Mac file meta-data not available via FSpGetFInfo() which should also be listed
-    * -x option: list file suffixes in a seperate column, kind of like the DOS dir command
-    * List total size/number of all files listed on top, akin to ls
+  * Implement calculation of folder sizes - recursively scan through hierarchy and add up total size
+  * There is other Mac file meta-data not available via FSpGetFInfo() which should also be listed
+  * -x option: list file suffixes in a seperate column, kind of like the DOS dir command
+  * List total size/number of all files listed on top, akin to ls
 */
 
 #include <stdio.h>
@@ -105,9 +109,7 @@ static long GetNumFilesInFolder (FSRef *fileRef);
 
 static short GetForkParameterFromString (char *str);
 
-// static char* GetSizeString (long size);
-static char* GetSizeString (UInt64 size);   // up to 99 TBytes
-// static char* GetHumanSizeString (long size);
+static char* GetSizeString (UInt64 size); // up to 99 TBytes
 static char* GetHumanSizeString (UInt64 size);
 
 static OSErr GetForkSizes (const FSRef *fileRef,  UInt64 *totalLogicalForkSize, UInt64 *totalPhysicalForkSize, short fork);
@@ -134,7 +136,7 @@ static UInt64 totalFolderSize;     // total size of files in folder
 /*@unused@*/ static const char rcsid[] = "@(#)" PROGRAM_STRING " " VERSION_STRING
     " $Id: lsmac.c,v 1.5 2004/12/19 22:59:06 carstenklapp Exp $";
 
-#define USAGE_STRING "lsmac [-LvhFsboaplQ] [-f fork] directory ..."
+#define USAGE_STRING "lsmac [-LvhFsboaplQ] [-f fork] [directory ...]"
 
 #define MAX_PATH_LENGTH     1024
 #define MAX_FILENAME_LENGTH 256

@@ -150,7 +150,7 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-%s] file ...\n", PROGRAM_STRING, OPT_STRING);
+  printf("usage: %s [-%s] [file ...]\n", PROGRAM_STRING, OPT_STRING);
 }
 
 #pragma mark -

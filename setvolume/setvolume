@@ -2,7 +2,7 @@
 
 if ($ARGV[0] =~ m/-\w*h/ or $ARGV[0] eq "")
 {
-  printf("Usage: setvolume [1-100]\n");
+  printf("Usage: setvolume [0-100]\n");
   exit(64);
 }
 

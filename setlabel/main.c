@@ -48,7 +48,7 @@ static void PrintHelp (void);
 static int UnixIsFolder (char *path);
 static void SetLabelInFlags (short *flags, short labelNum);
 
-const char  labelNames[8][7] = { "None", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Gray" };
+const char labelNames[8][7] = { "None", "Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Gray" };
 short silentMode = 0;
 
 static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo)
@@ -347,7 +347,7 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vhs] [label] [file ...]\n", PROGRAM_STRING);
+  printf("usage: %s [-vhs] label file ...\n", PROGRAM_STRING);
 }
 
 /*//////////////////////////////////////

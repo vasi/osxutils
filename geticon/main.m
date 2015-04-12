@@ -173,5 +173,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vh] [-t [icns|png|gif|tiff|jpeg]] [-o outputfile] [file]\n", PROGRAM_STRING);
+  printf("usage: %s [-vh] [-t [icns|png|gif|tiff|jpeg]] [-o outputfile] file\n", PROGRAM_STRING);
 }

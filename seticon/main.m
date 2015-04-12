@@ -127,5 +127,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vhd] [source] [file ...]\n", PROGRAM_STRING);
+  printf("usage: %s [-vhd] source file ...\n", PROGRAM_STRING);
 }
