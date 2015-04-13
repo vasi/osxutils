@@ -16,7 +16,9 @@
 .Ar
 .Sh DESCRIPTION
 .Nm
-is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one flag to be set or unset using the following options:
+is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one Finder flag to be set or unset using the following options, or alternatively use the
+.Fl p
+flag to see which Finder flags are currently set on the file:
 .Bl -tag -width indent
 .It Fl a
 Is Alias
@@ -42,6 +44,18 @@ invisibility flag and unset the custom icon flag.
 .Pp
 .Dl setfflags -i 1 -c 0 /path/to/file
 .Pp
+.Nm
+accepts the following options:
+.Bl -tag -width indent
+.It Fl h
+Print usage and exit.
+.It Fl m
+Silent mode.
+.It Fl p
+Print the file's current Finder flags.
+.It Fl v
+Print version and exit.
+.El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfflags" -compact
 .It Pa /usr/local/bin/setfflags
