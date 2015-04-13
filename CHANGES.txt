@@ -1,3 +1,23 @@
+This is a very incomplete list of changes.  Some of the individual code
+files contain more information.  Git commit history and previous CVS
+repository on SourceForge show the actual history of development.
+
+--
+
+Version 1.8 by Dave Vasilevsky
+
+I have updated it to work on 64-bit systems and modern versions of Mac OS X.
+
+- Wrote Makefile, since xcodeproj files are fragile
+- Replaced or rewrote deprecated functions
+- Rewrote 'trash' so it properly renames files
+- Getting OS 9 comments is not possible on OS X 10.5 and later
+- wsupdate is probably useless on modern systems
+
+Tested on Mac OS X 10.7 Lion. I'd appreciate if anybody wants to test on other versions as well.
+
+--
+
 Version 1.7 Release notes
 
 Some new tools:
