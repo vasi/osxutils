@@ -6,7 +6,7 @@
 .Nd set, remove and replace filename suffixes
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhsefar
+.Op Fl aefhrsv
 .Op Fl l Ar length
 .Fl x Ar suffix
 .Ar
@@ -18,28 +18,28 @@ files and determine what application to employ when opening them.
 .Nm
 accepts the following options:
 .Bl -tag -width indent
-.It Fl x Ar suffix
-Specify the suffix you want added, without the leading dot (".").  Specifying an empty string is the same as using the
-.Fl r
-option.
-.It Fl l Ar length
-Set the max number of characters that can constitute a valid suffix.
-.Nm
-defaults to 4, so without this specification it will ignore all suffixes longer than 4 characters.
-.It Fl s
-Silent mode.  Only critical errors or invalid usage errors are printed to stdout.
+.It Fl a
+Append the new suffix instead of replacing the old one.
 .It Fl e
 Ignore files that already have a suffix.
 .It Fl f
 Ignore folders.
-.It Fl a
-Append the new suffix instead of replacing the old one.
-.It Fl r
-Remove file suffix.  If this option is specified, all other options apart from -l are ignored.
-.It Fl v
-Print version and exit.
 .It Fl h
 Print usage and exit.
+.It Fl l Ar length
+Set the max number of characters that can constitute a valid suffix.
+.Nm
+defaults to 4, so without this specification it will ignore all suffixes longer than 4 characters.
+.It Fl r
+Remove file suffix.  If this option is specified, all other options apart from -l are ignored.
+.It Fl s
+Silent mode.  Only critical errors or invalid usage errors are printed to stdout.
+.It Fl v
+Print version and exit.
+.It Fl x Ar suffix
+Specify the suffix you want added, without the leading dot (".").  Specifying an empty string is the same as using the
+.Fl r
+option.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setsuffix" -compact

@@ -6,7 +6,7 @@
 .Nd set heritage MacOS File and Creator types
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhs
+.Op Fl hsv
 .Op Fl f Ar filetype
 .Op Fl c Ar creator
 .Ar
@@ -23,16 +23,16 @@ It is not neccesary to specify both the -f and -c options.
 accepts the following options:
 .Pp
 .Bl -tag -width indent
-.It Fl v
-Print version and exit.
-.It Fl h
-Print usage and exit.
-.It Fl s
-Silent mode.  No errors or problems are reported.
 .It Fl c Ar creator
 Specify four character Creator type.
 .It Fl f Ar filetype
 Specify four character File type.
+.It Fl h
+Print usage and exit.
+.It Fl s
+Silent mode.  No errors or problems are reported.
+.It Fl v
+Print version and exit.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfctypes" -compact

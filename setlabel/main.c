@@ -347,7 +347,7 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vhs] label file ...\n", PROGRAM_STRING);
+  printf("usage: %s [-hsv] label file ...\n", PROGRAM_STRING);
 }
 
 /*//////////////////////////////////////

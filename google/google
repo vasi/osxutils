@@ -11,9 +11,7 @@ use warnings;
 my $google_url = "http://www.google.com/search?q=";
 my $google_img_url = "http://images.google.com/images?q=";
 
-my $USAGE = <<EOF;
-usage: google [-ih] searchword ...
-EOF
+my $USAGE = "usage: google [-hi] searchword ...";
 
 # Handle image search flag
 my $opt = $ARGV[0] || '';

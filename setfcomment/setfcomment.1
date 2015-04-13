@@ -6,7 +6,7 @@
 .Nd set MacOS Finder comments of files and folders
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhns
+.Op Fl hnsv
 .Fl c Ar comment
 .Ar
 .Sh DESCRIPTION
@@ -24,6 +24,8 @@ The following options are supported:
 .Bl -tag -width indent
 .It Fl c Ar comment
 Specify the string you wish to set as Finder comment.  This parameter is required.
+.It Fl h
+Print usage and exit.
 .It Fl n
 Omit setting MacOS 9 Finder comment.  If this flag is set, the comments set with
 .Nm
@@ -32,8 +34,6 @@ will not be visible in the MacOS 9 Finder.
 Silent mode.  Send no output to STDOUT confirming that the comment for each input file has been successfully set.
 .It Fl v
 Print version and exit.
-.It Fl h
-Print usage and exit.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/setfcomment" -compact

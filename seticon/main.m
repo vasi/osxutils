@@ -43,7 +43,7 @@
 #define  PROGRAM_STRING "seticon"
 #define  VERSION_STRING "0.2"
 #define  AUTHOR_STRING  "Sveinbjorn Thordarson"
-#define  OPT_STRING     "vhd"
+#define  OPT_STRING     "dhv"
 
 static int UnixIsFolder (char *path);
 static void PrintVersion (void);

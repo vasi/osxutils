@@ -6,30 +6,30 @@
 .Nd set the MacOS Finder flags of files
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhmp
-.Op Fl c Ar bool
-.Op Fl s Ar bool
-.Op Fl l Ar bool
-.Op Fl b Ar bool
-.Op Fl i Ar bool
+.Op Fl hmpv
 .Op Fl a Ar bool
+.Op Fl b Ar bool
+.Op Fl c Ar bool
+.Op Fl i Ar bool
+.Op Fl l Ar bool
+.Op Fl s Ar bool
 .Ar
 .Sh DESCRIPTION
 .Nm
 is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one flag to be set or unset using the following options:
 .Bl -tag -width indent
-.It Fl c
-Has Custom Icon
-.It Fl s
-Is Stationery
-.It Fl l
-Is Name Locked
-.It Fl b
-Has Bundle Bit
-.It Fl i
-Is Invisible
 .It Fl a
 Is Alias
+.It Fl b
+Has Bundle Bit
+.It Fl c
+Has Custom Icon
+.It Fl i
+Is Invisible
+.It Fl l
+Is Name Locked
+.It Fl s
+Is Stationery
 .El
 .Pp
 The specification of each of the above must be followed by a boolean value, i.e. "true"/"false" or 1/0.

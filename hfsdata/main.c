@@ -105,9 +105,9 @@ Boolean MyAEIdleCallback (EventRecord * theEvent,SInt32 * sleepTime,RgnHandle * 
 #define		VERSION_STRING		"0.1"
 #define		AUTHOR_STRING 		"Sveinbjorn Thordarson"
 #if __LP64__
-#define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|e] file\nor\nhfsdata [-hv]\n"
+#define USAGE_STRING "hfsdata -AaCcDdehkLlmOoRrSsTtvx file\nor\nhfsdata [-hv]\n"
 #else
-#define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|O|e] file\nor\nhfsdata [-hv]\n"
+#define USAGE_STRING "hfsdata -AaCcDdehkLlmoRrSsTtvx file\nor\nhfsdata [-hv]\n"
 #endif
 
 // The Mac Four-Character Application Signature for the Finder
@@ -116,7 +116,6 @@ static const OSType gFinderSignature = 'MACS';
 int main (int argc, const char * argv[])
 {
 	OSErr		err = noErr;
-    int			rc;
     int			optch;
 	char		*path;
 	FSRef		fileRef;
@@ -198,7 +197,6 @@ int main (int argc, const char * argv[])
 				type = kAliasOriginal;
 				break;
 			default: // '?'
-                rc = 1;
                 PrintUsage();
                 return 0;
         }

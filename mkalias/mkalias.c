@@ -62,7 +62,7 @@
 #define PROGRAM_STRING "mkalias"
 #define VERSION_STRING "0.5"
 #define AUTHOR_STRING  "Sveinbjorn Thordarson"
-#define OPT_STRING     "vhctr"
+#define OPT_STRING     "chrtv"
 
 static void CreateAlias (char *srcPath, char *destPath);
 static short UnixIsFolder (char *path);

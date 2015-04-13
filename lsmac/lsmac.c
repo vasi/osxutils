@@ -126,7 +126,7 @@ static short GetLabelNumber (SInt16 flags);
 static OSErr MyFSPathMakeRef( const unsigned char *path, FSRef *ref );  // path to the link itself
 static OSErr ConvertCStringToHFSUniStr(const char* cStr, HFSUniStr255 *uniStr);
 
-static UInt64 totalFolderSize;     // total size of files in folder
+static UInt64 totalFolderSize; // total size of files in folder
 
 #define PROGRAM_STRING "lsmac"
 #define VERSION_STRING "0.5"
@@ -136,7 +136,7 @@ static UInt64 totalFolderSize;     // total size of files in folder
 /*@unused@*/ static const char rcsid[] = "@(#)" PROGRAM_STRING " " VERSION_STRING
     " $Id: lsmac.c,v 1.5 2004/12/19 22:59:06 carstenklapp Exp $";
 
-#define USAGE_STRING "lsmac [-LvhFsboaplQ] [-f fork] [directory ...]"
+#define USAGE_STRING "lsmac [-abFhLlopQsv] [-f fork] [directory ...]"
 
 #define MAX_PATH_LENGTH     1024
 #define MAX_FILENAME_LENGTH 256

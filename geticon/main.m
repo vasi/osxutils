@@ -172,5 +172,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vh] [-o outputfile] file\n", PROGRAM_STRING);
+  printf("usage: %s [-hv] [-o outputfile] file\n", PROGRAM_STRING);
 }

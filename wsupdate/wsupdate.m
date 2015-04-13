@@ -51,7 +51,7 @@
 #define PROGRAM_STRING "wsupdate"
 #define VERSION_STRING "0.2"
 #define AUTHOR_STRING  "Sveinbjorn Thordarson"
-#define OPT_STRING     "vh"
+#define OPT_STRING     "hv"
 
 /*
   Version History
@@ -126,5 +126,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vh] [file ...]\n", PROGRAM_STRING);
+  printf("usage: %s [-%s] [file ...]\n", PROGRAM_STRING, OPT_STRING);
 }

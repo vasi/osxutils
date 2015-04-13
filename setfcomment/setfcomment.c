@@ -277,7 +277,7 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-    printf("usage: %s [-vhn] [-c comment] [file ...]\n", PROGRAM_STRING);
+    printf("usage: %s [-hnsv] [-c comment] file ...\n", PROGRAM_STRING);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

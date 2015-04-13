@@ -6,7 +6,7 @@
 .Nd create MacOS Finder aliases
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhctr
+.Op Fl chrtv
 .Op Ar source-file
 .Op Ar target-alias
 .Sh DESCRIPTION
@@ -19,16 +19,16 @@ File and Creator type, and has the kIsAlias and kHasCustomIcon Finder flags set.
 .Pp
 The following options are accepted:
 .Bl -tag -width indent
-.It Fl r
-Make the alias relative instead of absolute.
 .It Fl c
 Do not copy source file's icon to target alias.
+.It Fl h
+Print usage and exit.
+.It Fl r
+Make the alias relative instead of absolute.
 .It Fl t
 Source file's type and creator are not applied to the alias
 .It Fl v
 Print version and exit.
-.It Fl h
-Print usage and exit.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/mkalias" -compact

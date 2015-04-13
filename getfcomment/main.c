@@ -23,23 +23,7 @@
 
 	0.3 - exit constants used from sysexits.h, manpage updated
 	0.2 - Apple Events querying Finder for comment -- now compatible with Mac OS X comments
-    0.1 - First release of getfcomment.  It only supports Mac OS 9 Desktop Database comments at the moment
-
-*/
-
-/*  TODO
-
-    * Mac OS X comments
-
-*/
-
-
-/*
-    Command line options
-
-    v - version
-    h - help - usage
-	c - get Mac OS 9 Desktop Database comment instead of querying the Finder via Apple Events
+  0.1 - First release of getfcomment.  It only supports Mac OS 9 Desktop Database comments at the moment
 
 */
 
@@ -53,8 +37,8 @@
 
 
 // Some MoreAppleEvents stuff
-            #define MoreAssert(x) (true)
-            #define MoreAssertQ(x)
+#define MoreAssert(x) (true)
+#define MoreAssertQ(x)
 
 ///////////////  Definitions    //////////////
 
@@ -271,9 +255,9 @@ static void PrintVersion (void)
 static void PrintHelp (void)
 {
 #if !__LP64__
-  printf("usage: %s [-vhpc] file ...\n", PROGRAM_STRING);
+  printf("usage: %s [-chpv] file ...\n", PROGRAM_STRING);
 #else
-  printf("usage: %s [-vhp] file ...\n", PROGRAM_STRING);
+  printf("usage: %s [-hpv] file ...\n", PROGRAM_STRING);
 #endif
 }
 

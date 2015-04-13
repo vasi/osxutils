@@ -6,7 +6,7 @@
 .Nd retrieve Mac meta-data for a file or folder
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhxAcmatrRsSdDTCklLoOe
+.Op Fl AaCcDdehkLlmOoRrSsTtvx
 .Ar file
 .Sh DESCRIPTION
 .Nm
@@ -14,50 +14,50 @@ is a command line tool to get all sorts of miscellaneous HFS or Mac OS-specific
 meta-data for a given file.  You can specify the exact meta-data you want to be
 printed as output by using one of these flags:
 .Bl -tag -width indent
-.It Fl e
-Print the path of the file pointed to by a given alias.
-.It Fl x
-Print whether file's suffix is hidden by Finder or not.
 .It Fl A
 Print the name of the preferred application for opening the file.
-.It Fl c
-Print date created in standard format.
-.It Fl m
-Print date modified in standard format.
 .It Fl a
 Print date accessed in standard format.
-.It Fl t
-Print date attribute was modified in standard format.
-.It Fl r
-Print logical resource fork size in bytes.
-.It Fl R
-Print physical resource fork size in bytes.
-.It Fl s
-Print total logical size of all forks in bytes.
-.It Fl S
-Print total physical size of all forks in bytes.
-.It Fl d
-Print logical data fork size in bytes.
-.It Fl D
-Print physical data fork size in bytes.
-.It Fl T
-Print the file's 4-character type code.
 .It Fl C
 Print the file's 4-character creator code.
-.It Fl k
-Print the file's 'Kind', as it appears in Finder.
-.It Fl l
-Print the file's label as a number (i.e. 0-8).
-.It Fl L
-Print the file's label as a name (e.g. Green).
-.It Fl o
-Print the file's Mac OS X Finder comment.
-.It Fl O
-Print the file's Mac OS 9 Desktop Database comment.
-.It Fl v
-Print version and exit.
+.It Fl c
+Print date created in standard format.
+.It Fl D
+Print physical data fork size in bytes.
+.It Fl d
+Print logical data fork size in bytes.
+.It Fl e
+Print the path of the file pointed to by a given alias.
 .It Fl h
 Print usage and exit.
+.It Fl k
+Print the file's 'Kind', as it appears in Finder.
+.It Fl L
+Print the file's label as a name (e.g. Green).
+.It Fl l
+Print the file's label as a number (i.e. 0-8).
+.It Fl O
+Print the file's Mac OS 9 Desktop Database comment.
+.It Fl o
+Print the file's Mac OS X Finder comment.
+.It Fl m
+Print date modified in standard format.
+.It Fl R
+Print physical resource fork size in bytes.
+.It Fl r
+Print logical resource fork size in bytes.
+.It Fl S
+Print total physical size of all forks in bytes.
+.It Fl s
+Print total logical size of all forks in bytes.
+.It Fl T
+Print the file's 4-character type code.
+.It Fl t
+Print date attribute was modified in standard format.
+.It Fl v
+Print version and exit.
+.It Fl x
+Print whether file's suffix is hidden by Finder or not.
 .El
 .Pp
 .Sh FILES

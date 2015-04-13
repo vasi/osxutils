@@ -6,8 +6,8 @@
 .Nd list files in directory and associated Mac meta-data
 .Sh SYNOPSIS
 .Nm
-.Op Fl LvhFsboaplQ
-.Op Fl F Ar fork
+.Op Fl abFhLlopQsv
+.Op Fl f Ar fork
 .Op directory ...
 .Sh DESCRIPTION
 .Ar lsmac
@@ -40,28 +40,28 @@ a file with all the flags set would be listed as 'ICLBAS'.
 accepts the following options:
 .Pp
 .Bl -tag -width indent
-.It Fl v
-Print version and exit.
+.It Fl a
+Display all files, including files with the . prefix.
+.It Fl b
+Display file size in bytes (i.e. 12977128 bytes).
+.It Fl F
+Only list folders when listing directory contents.
+.It Fl f Ar fork
+Specify which forks to count when calculating file size.  You can specify fork as 'rsrc', 'data' or 'both' (minus quote marks).
 .It Fl h
 Print usage and exit.
 .It Fl L
 Prepend the MacOS Label name of the file to each output line.
-.It Fl f[fork]
-Specify which forks to count when calculating file size.  You can specify fork as 'rsrc', 'data' or 'both' (minus quote marks).
-.It Fl b
-Display file size in bytes (i.e. 12977128 bytes).
+.It Fl l
+When listing file size, use physical size instead of logical size.
 .It Fl o
 Omit folders when listing directory contents.
-.It Fl F
-Only list folders when listing directory contents.
-.It Fl a
-Display all files, including files with the . prefix.
 .It Fl p
 Display full file paths instead of file names.
 .It Fl Q
 Display file name or path within quotation marks ("...").
-.It Fl l
-When listing file size, use physical size instead of logical size.
+.It Fl v
+Print version and exit.
 .El
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/lsmac" -compact

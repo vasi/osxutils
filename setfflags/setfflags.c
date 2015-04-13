@@ -405,6 +405,6 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-mvh] [-c bool] [-s bool] [-i bool] [-l bool] [-b bool] [-a bool] file ...\n", PROGRAM_STRING);
+  printf("usage: %s [-hmv] [-a bool] [-b bool] [-c bool] [-i bool] [-l bool] [-s bool] file ...\n", PROGRAM_STRING);
   printf("   or: %s [-p] file ...\n", PROGRAM_STRING);
 }

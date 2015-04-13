@@ -249,5 +249,5 @@ static void PrintVersion (void)
 
 static void PrintHelp (void)
 {
-  printf("usage: %s [-vhs] [-f filetype] [-c creator] [file ...]\n", PROGRAM_STRING);
+  printf("usage: %s [-hsv] [-f filetype] [-c creator] file ...\n", PROGRAM_STRING);
 }
