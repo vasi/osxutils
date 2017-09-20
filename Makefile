@@ -4,7 +4,7 @@ MY_CFLAGS = -fpascal-strings
 
 NAMES_CARBON = fileinfo getfcomment hfsdata lsmac mkalias setfcomment setfctypes setfflags setlabel setsuffix
 NAMES_COCOA = geticon seticon wsupdate
-NAMES_SCRIPT = cpath google osxutils rcmac getvolume setvolume trash wiki
+NAMES_SCRIPT = cpath google osxutils rcmac getvolume setvolume trash wikipedia
 NAMES = $(NAMES_CARBON) $(NAMES_COCOA)
 PROGRAMS = $(foreach name,$(NAMES),$(name)/$(name))
 SCRIPTS = $(foreach name,$(NAMES_SCRIPT),$(name)/$(name))
