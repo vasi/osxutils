@@ -1,5 +1,5 @@
 /*
-  fileinfo - list info about files in MacOS X
+  finfo - list info about files in MacOS X
   Copyright (C) 2003  Sveinbjorn Thordarson <sveinbt@hi.is>
 
   This program is free software; you can redistribute it and/or modify
@@ -32,8 +32,8 @@
 #include <Carbon/Carbon.h>
 #include <string.h>
 
-#define   PROGRAM_STRING    "fileinfo"
-#define   VERSION_STRING    "0.1"
+#define   PROGRAM_STRING    "finfo"
+#define   VERSION_STRING    "0.1.1"
 #define   AUTHOR_STRING     "Sveinbjorn Thordarson <sveinbt@hi.is>"
 
 #define   MAX_PATH_LENGTH     1024
@@ -167,13 +167,13 @@ void PrintFileInfo (char *path)
   err = RetrieveStatData(&file);
   if (err)
   {
-    (void)fprintf(stderr, "\nfileinfo: %s: Error %d when retrieving stat data\n", &file.path, err);
+    (void)fprintf(stderr, "\nfinfo: %s: Error %d when retrieving stat data\n", &file.path, err);
     return;
   }
   err = RetrieveFileInfo (&file);
   if (err)
   {
-    (void)fprintf(stderr, "\nfileinfo: %s: Error %d when retrieving file info\n", &file.path, err);
+    (void)fprintf(stderr, "\nfinfo: %s: Error %d when retrieving file info\n", &file.path, err);
     return;
   }
 
@@ -248,7 +248,7 @@ OSErr RetrieveStatData (FileInfoStruct *file)
       file->kind = FILETYPE_SYMLINK;
       if ((lnklen = readlink(&file->path, file->targetPath, sizeof(file->targetPath) - 1)) == -1)
       {
-        (void)fprintf(stderr, "\nfileinfo: %s: %s\n", &file->path, strerror(errno));
+        (void)fprintf(stderr, "\nfinfo: %s: %s\n", &file->path, strerror(errno));
         return errno;
       }
       file->path[lnklen] = '\0';

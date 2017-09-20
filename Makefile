@@ -2,7 +2,7 @@ OPT = -w
 ARCH =
 MY_CFLAGS = -fpascal-strings
 
-NAMES_CARBON = fileinfo getfcomment hfsdata lsmac mkalias setfcomment setfctypes setfflags setlabel setsuffix
+NAMES_CARBON = finfo getfcomment hfsdata lsmac mkalias setfcomment setfctypes setfflags setlabel setsuffix
 NAMES_COCOA = geticon seticon wsupdate
 NAMES_SCRIPT = cpath google osxutils rcmac getvolume setvolume mvtrash wikipedia
 NAMES = $(NAMES_CARBON) $(NAMES_COCOA)

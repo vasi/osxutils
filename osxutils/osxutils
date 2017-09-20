@@ -3,7 +3,7 @@
 print "'osxutils' is a collection of MacOS command line utilities. The programs are listed in alphabetical order, followed by a short description of their function. For more detail on the functionality of individual tools, refer to their individual man pages.\n\n";
 
 print "cpath        copy the current working directory to the clipboard\n";
-print "fileinfo     print information about a file in a style similar to the Mac OS X Finder\n";
+print "finfo        print information about a file in a style similar to the Mac OS X Finder\n";
 print "getfcomment  print a file's Spotlight comment\n";
 print "geticon      extract a file's icon as an image\n";
 print "getvolume    show the global system volume setting\n";
