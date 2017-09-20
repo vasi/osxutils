@@ -19,7 +19,7 @@ print "seticon      set a file's OS X Icon\n";
 print "setlabel     set a file's Finder Label\n";
 print "setsuffix    batch modify file suffices\n";
 print "setvolume    set the global system volume\n";
-print "trash        move a file to the Trash\n";
+print "mvtrash      move a file to the Trash\n";
 print "wikipedia    search Wikipedia in default browser\n";
 print "wsupdate     update the Finder filesystem display\n";
 print "\n";
