@@ -309,6 +309,7 @@ pascal OSErr MoreFESetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr
 	{
 		char* dataPtr = NewPtr(pCommentStr[0] + 1);
         strncpy(dataPtr, (char*)pCommentStr + 1, pCommentStr[0]);
+        dataPtr[pCommentStr[0]] = 0;
 		anErr = AEBuildAppleEvent(
 			        kAECoreSuite,kAESetData,
 					typeApplSignature,&gFinderSignature,sizeof(OSType),
