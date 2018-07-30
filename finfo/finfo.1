@@ -1,0 +1,37 @@
+.Dd September 20, 2017
+.Dt finfo 1
+.Os Darwin
+.Sh NAME
+.Nm finfo
+.Nd print information about a file in a style similar to the Mac OS X Finder
+.Sh SYNOPSIS
+.Nm
+.Op Fl vh
+.Op Ar
+.Sh DESCRIPTION
+.Nm
+is a program for printing all sorts of information about a file in a style similar to the
+Mac OS X Finder Get Info window.  It lists all sorts of Mac OS-specific metadata information.
+.Pp
+A list of flags accepted by finfo and their descriptions:
+.Bl -tag -width indent
+.It Fl v
+Print version and exit.
+.It Fl h
+Print usage and exit.
+.El
+.Pp
+.Sh FILES
+.Bl -tag -width "/usr/local/bin/finfo" -compact
+.It Pa /usr/local/bin/finfo
+.El
+.Sh AUTHOR
+Originally written by
+.An Sveinbjorn Thordarson Aq sveinbjornt@gmail.com .
+.Sh SEE ALSO
+.Xr setfflags 1 ,
+.Xr setfctypes 1 ,
+.Xr setfcomment 1 ,
+.Xr setlabel 1 ,
+.Xr GetFileInfo 1 ,
+.Xr hfsdata 1

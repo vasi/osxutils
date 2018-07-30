@@ -13,16 +13,17 @@ use File::Copy qw(move);
 my $exit = 0;
 my $trash = catfile($ENV{HOME}, '.Trash');
 foreach my $arg (@ARGV) {
-   my $cnt = 1;
-   my $base = basename($arg);
-   my $tname = catfile($trash, $base);
-   while (-e $tname) {
-       $tname = catfile($trash, "$base copy $cnt");
-       ++$cnt;
-   }
-   unless (move($arg, $tname)) {
-	   print STDERR "Error trashing $arg: $!\n";
-	   $exit = 1;
-   }
+  my $cnt = 1;
+  my $base = basename($arg);
+  my $tname = catfile($trash, $base);
+  while (-e $tname) {
+    $tname = catfile($trash, "$base copy $cnt");
+    ++$cnt;
+  }
+  unless (move($arg, $tname)) {
+    print STDERR "Error trashing $arg: $!\n";
+    $exit = 1;
+  }
 }
+
 exit $exit;

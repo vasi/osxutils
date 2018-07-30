@@ -1,0 +1,23 @@
+.Dd September 20, 2017
+.Dt mvtrash 1
+.Os Darwin
+.Sh NAME
+.Nm mvtrash
+.Nd move files to the Trash
+.Sh SYNOPSIS
+.Nm
+.Ar
+.Sh DESCRIPTION
+.Nm
+is akin to the 'rm' command but instead of unlinking files it moves them into the MacOS Trash
+in the user's home directory.  It behaves in a similar way to Finder in this respect, since
+files are renamed to 'File copy 1' and so forth if they already exist in the Trash.
+.Sh FILES
+.Bl -tag -width "/usr/local/bin/mvtrash" -compact
+.It Pa /usr/local/bin/mvtrash
+.El
+.Sh AUTHOR
+Originally written by
+.An Sveinbjorn Thordarson Aq sveinbjornt@gmail.com .
+.Sh SEE ALSO
+.Xr rm 1

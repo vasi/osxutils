@@ -18,29 +18,13 @@
 
 */
 
-  
+
 /*  CHANGES
-    
+
 	0.3 - exit constants used from sysexits.h, manpage updated
 	0.2 - Apple Events querying Finder for comment -- now compatible with Mac OS X comments
-    0.1 - First release of getfcomment.  It only supports Mac OS 9 Desktop Database comments at the moment
+  0.1 - First release of getfcomment.  It only supports Mac OS 9 Desktop Database comments at the moment
 
-*/
-
-/*  TODO
-        
-    * Mac OS X comments
-
-*/
-
-
-/*
-    Command line options
-
-    v - version
-    h - help - usage
-	c - get Mac OS 9 Desktop Database comment instead of querying the Finder via Apple Events
-    
 */
 
 #include <stdio.h>
@@ -53,8 +37,8 @@
 
 
 // Some MoreAppleEvents stuff
-            #define MoreAssert(x) (true)
-            #define MoreAssertQ(x)
+#define MoreAssert(x) (true)
+#define MoreAssertQ(x)
 
 ///////////////  Definitions    //////////////
 
@@ -76,7 +60,7 @@ static const OSType gFinderSignature = 'MACS';
 	static void PrintFileComment (char *path);
     static void PrintVersion (void);
     static void PrintHelp (void);
-	
+
 	//AE functions from MoreAppleEvents.c, Apple's sample code
     pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
 	pascal void MoreAEDisposeDesc(AEDesc* desc);
@@ -92,9 +76,9 @@ static const OSType gFinderSignature = 'MACS';
 
 
 
-//main 
+//main
 
-int main (int argc, const char * argv[]) 
+int main (int argc, const char * argv[])
 {
 	int			rc;
     int			optch;
@@ -126,10 +110,10 @@ int main (int argc, const char * argv[])
                 return EX_USAGE;
         }
     }
-	
+
     //all remaining arguments should be files
     for (; optind < argc; ++optind)
-    {    
+    {
 		if (os9comment)
 			PrintFileComment((char *)argv[optind]);
 		else
@@ -155,7 +139,7 @@ static void PrintOSXComment (char *path)
 				perror(path);
                 return;
             }
-            
+
             //get file reference from path
             err = FSPathMakeRef(path, &fileRef, NULL);
             if (err != noErr)
@@ -163,7 +147,7 @@ static void PrintOSXComment (char *path)
 				fprintf(stderr, "FSPathMakeRef: Error %d for file %s\n", err, path);
                 return;
             }
-        
+
             //retrieve filespec from file ref
             err = FSGetCatalogInfo (&fileRef, NULL, NULL, NULL, &fileSpec, NULL);
             if (err != noErr)
@@ -171,8 +155,8 @@ static void PrintOSXComment (char *path)
 				fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec for %s\n", err, path);
                 return;
             }
-    
-    
+
+
     ///////////// oK, now we can go about getting the comment /////////////
 
 	// call the apple event routine. I'm not going to pretend I understand what's going on
@@ -190,7 +174,7 @@ static void PrintOSXComment (char *path)
 	//if there is no comment, we don't print out anything
 	if (!strlen((char *)&cStrCmt))
 		return;
-	
+
 	//print out the comment
 	if (!printFileName)
 			printf("%s\n", (char *)&cStrCmt);
@@ -216,7 +200,7 @@ static void PrintFileComment (char *path)
 		perror(path);
 		return;
 	}
-	
+
 	//get file reference from path
 	err = FSPathMakeRef(path, &fileRef, NULL);
 	if (err != noErr)
@@ -236,21 +220,21 @@ static void PrintFileComment (char *path)
     ///////////// oK, now we can go about getting the comment /////////////
 
 	dt.ioVRefNum = fileSpec.vRefNum;
-        
+
     err = PBDTGetPath(&dt);
 	if (err != noErr)
 	{
 		fprintf(stderr, "Can't get OS 9 comments for %s\n", path);
 		return;
 	}
-    
+
     //fill in the relevant fields (using parameters)
     dt.ioNamePtr = fileSpec.name;
     dt.ioDirID = fileSpec.parID;
     dt.ioDTBuffer = (char *)&buf;
-	
+
 	PBDTGetCommentSync(&dt);
-	
+
 	if (dt.ioDTActCount != 0) //if zero, that means no comment
 	{
 		strncpy((char *)&comment, (char *)&buf, dt.ioDTActCount);
@@ -263,34 +247,25 @@ static void PrintFileComment (char *path)
 #endif
 }
 
-
-////////////////////////////////////////
-// Print version and author to stdout
-///////////////////////////////////////
-
 static void PrintVersion (void)
 {
-    printf("%s version %s by %s\n", PROGRAM_STRING, VERSION_STRING, AUTHOR_STRING);
+  printf("%s version %s by %s\n", PROGRAM_STRING, VERSION_STRING, AUTHOR_STRING);
 }
-
-////////////////////////////////////////
-// Print help string to stdout
-///////////////////////////////////////
 
 static void PrintHelp (void)
 {
-    printf("usage: %s [-vhp] [file ...]\n", PROGRAM_STRING);
+#if !__LP64__
+  printf("usage: %s [-chpv] file ...\n", PROGRAM_STRING);
+#else
+  printf("usage: %s [-hpv] file ...\n", PROGRAM_STRING);
+#endif
 }
-
-
-#pragma mark -
 
 Boolean MyAEIdleCallback (
    EventRecord * theEvent,
    SInt32 * sleepTime,
    RgnHandle * mouseRgn)
 {
-
 	return 0;
 }
 
@@ -326,7 +301,7 @@ pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr
         (void) MoreAEDisposeDesc(&tAEDesc);
 
     if (noErr == anErr)
-    {  
+    {
       //  Send the event.
       anErr = MoreAESendEventReturnPString(pIdleProcUPP,&tAppleEvent,pCommentStr);
 	  if (anErr)
@@ -345,13 +320,13 @@ pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr
 }  // end MoreFEGetComment
 
 /********************************************************************************
-  Send an Apple event to the Finder to get the finder comment of the item 
+  Send an Apple event to the Finder to get the finder comment of the item
   specified by the FSRefPtr.
 
   pFSRefPtr    ==>    The item to get the file kind of.
   pCommentStr    ==>    A string into which the finder comment will be returned.
   pIdleProcUPP  ==>    A UPP for an idle function (required)
-  
+
   See note about idle functions above.
 */
 #if TARGET_API_MAC_CARBON
@@ -382,7 +357,7 @@ pascal OSErr MoreFEGetCommentCFString(const FSRefPtr pFSRefPtr, CFStringRef* pCo
         (void) MoreAEDisposeDesc(&tAEDesc);
 
     if (noErr == anErr)
-    {  
+    {
 #if 0  // Set this true to printf the Apple Event before you send it.
       Handle strHdl;
       anErr = AEPrintDescToHandle(&tAppleEvent,&strHdl);
@@ -418,7 +393,7 @@ pascal void MoreAEDisposeDesc(AEDesc* desc)
 	OSStatus junk;
 
 	MoreAssertQ(desc != nil);
-	
+
 	junk = AEDisposeDesc(desc);
 	MoreAssertQ(junk == noErr);
 
@@ -486,11 +461,11 @@ pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,A
 			if ((anErr = MemError()) == noErr)
 			{
 				CFStringGetCharacters(tCFStringRef, CFRangeMake(0,bufSize/2), buf);
-				if (isDirectory) (buf)[(bufSize-1)/2] = (UniChar) 0x003A;				
+				if (isDirectory) (buf)[(bufSize-1)/2] = (UniChar) 0x003A;
 			}
 		} else
 			anErr = coreFoundationUnknownErr;
-		
+
 		if (anErr == noErr)
 			anErr = AECreateDesc(typeUnicodeText, buf, GetPtrSize((Ptr) buf), &nameDesc);
 		if (anErr == noErr)
@@ -565,17 +540,17 @@ pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply)
 {
   OSStatus  anError = noErr;
   OSErr    handlerErr;
-  
+
   DescType  actualType;
   long    actualSize;
-  
+
   if ( pAEReply->descriptorType != typeNull )  // there's a reply, so there may be an error
   {
     OSErr  getErrErr = noErr;
-    
+
     getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeSInt16, &actualType,
                   &handlerErr, sizeof( OSErr ), &actualSize );
-    
+
     if ( getErrErr != errAEDescNotFound )  // found an errorNumber parameter
     {
       anError = handlerErr;          // so return it's value

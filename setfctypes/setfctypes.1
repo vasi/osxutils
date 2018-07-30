@@ -1,60 +1,50 @@
-.Dd Wed Mar 31 2003               \" DATE 
-.Dt setfctypes 1      \" Program name and manual section number 
+.Dd September 20, 2017
+.Dt setfctypes 1
 .Os Darwin
-.Sh NAME                 \" Section Header - required - don't modify 
+.Sh NAME
 .Nm setfctypes
-.\" The following lines are read in generating the apropos(man -k) database. Use only key
-.\" words here as the database is built based on the words here and in the .ND line. 
-.\" Use .Nm macro to designate other names for the documented program.
-.Nd set heritage MacOS File and Creator types.
-.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nd set heritage MacOS File and Creator types
+.Sh SYNOPSIS
 .Nm
-.Op Fl vhs
-.Op Fl f filetype
-.Op Fl c creator              
-.Ar file ...         
-.Sh DESCRIPTION          \" Section Header - required - don't modify
-.Ar setfctypes
+.Op Fl hsv
+.Op Fl f Ar filetype
+.Op Fl c Ar creator
+.Ar
+.Sh DESCRIPTION
+.Nm
 is a utility for setting the heritage MacOS File Type and Creator Type of files.  It's very simple to use and is about
-twice as fast as Apple's SetFile(1) command.  An example of typical usage would be:
-.Bl -tag -width -indent  
-.It setfctypes -f TEXT -c ttxt myfile.txt
-.El                      \" Ends the list
+twice as fast as Apple's
+.Xr SetFile 1
+command.  An example of typical usage would be:
+.Pp
+.Dl setfctypes -f TEXT -c ttxt myfile.txt
 .Pp
 It is not neccesary to specify both the -f and -c options.
 .Pp
-.Ar setfctypes
+.Nm
 accepts the following options:
 .Pp
-.Bl -tag -width indent  \" Differs from above in tag removed 
-.It Fl v                 \"-a flag as a list item
-Prints version and author and then exits
+.Bl -tag -width indent
+.It Fl c Ar creator
+Specify four character Creator type.
+.It Fl f Ar filetype
+Specify four character File type.
 .It Fl h
-Prints help
+Print usage and exit.
 .It Fl s
 Silent mode.  No errors or problems are reported.
-.It Fl c
-Followed by a four character string specifying Creator type.
-.It Fl f
-Followed by a four character string specifying File type.
-.El                      \" Ends the list
-.Pp
-Please direct queries to Sveinbjorn Thordarson <sveinbt@hi.is>.
-.Pp                 
-.Sh FILES                \" File used or created by the topic of the man page
+.It Fl v
+Print version and exit.
+.El
+.Sh FILES
 .Bl -tag -width "/usr/local/bin/setfctypes" -compact
 .It Pa /usr/local/bin/setfctypes
-.Sh SEE ALSO 
-.\" List links in ascending order by section, alphabetically within a section.
-.\" Please do not reference files that do not exist without filing a bug report
-.Xr lsmac 1 , 
+.Sh AUTHOR
+Originally written by
+.An Sveinbjorn Thordarson Aq sveinbjornt@gmail.com .
+.Sh SEE ALSO
 .Xr SetFile 1 ,
-.Xr GetFileInfo 1 ,
 .Xr setlabel 1 ,
-.Xr seticon 1 ,
 .Xr setfcomment 1 ,
 .Xr setfflags 1 ,
-.Xr setsuffix 1
-.\" .Sh BUGS              \" Document known, unremedied bugs 
-.\" .Sh HISTORY           \" Document history if command behaves in a unique manner 
-
+.Xr finfo 1

@@ -1,59 +1,70 @@
-.Dd Mon Apr 21 2003               \" DATE 
-.Dt setfflags 1     
+.Dd September 20, 2017
+.Dt setfflags 1
 .Os Darwin
-.Sh NAME                 
+.Sh NAME
 .Nm setfflags
-.Nd Set the MacOS Finder flags of files
-.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nd set the MacOS Finder flags of files
+.Sh SYNOPSIS
 .Nm
-.Op Fl vhmp
-.Op Fl c Ar bool
-.Op Fl s Ar bool
-.Op Fl l Ar bool
-.Op Fl b Ar bool
-.Op Fl i Ar bool
+.Op Fl hmpv
 .Op Fl a Ar bool
-.Ar file
-.Ar ...
-.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Op Fl b Ar bool
+.Op Fl c Ar bool
+.Op Fl i Ar bool
+.Op Fl l Ar bool
+.Op Fl s Ar bool
+.Ar
+.Sh DESCRIPTION
 .Nm
-is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one flag to be set or unset using the following options:
-.Pp                      \" Inserts a space
-.Bl -tag -width -indent  \" Differs from above in tag removed 
-.It Fl c                 
-Has Custom Icon
-.It Fl s                
-Is Stationery
-.It Fl l                 
-Is Name Locked
-.It Fl b                 
-Has Bundle Bit
-.It Fl i                 
-Is Invisible
-.It Fl a                 
+is a command line program for altering the MacOS Finder flags of files and/or folders.  You must specify at least one Finder flag to be set or unset using the following options, or alternatively use the
+.Fl p
+flag to see which Finder flags are currently set on the file:
+.Bl -tag -width indent
+.It Fl a
 Is Alias
-.El                      \" Ends the list
+.It Fl b
+Has Bundle Bit
+.It Fl c
+Has Custom Icon
+.It Fl i
+Is Invisible
+.It Fl l
+Is Name Locked
+.It Fl s
+Is Stationery
+.El
 .Pp
 The specification of each of the above must be followed by a boolean value, i.e. "true"/"false" or 1/0.
 Here's an example of typical usage.  Let's say we want to set a file's Invisibility flag:
-.Pp   
-# setfflags -i true /path/to/file
 .Pp
-Using numbers instead of string to specify the boolean value is also permitted.  Here we set the 
+.Dl setfflags -i true /path/to/file
+.Pp
+Using numbers instead of string to specify the boolean value is also permitted.  Here we set the
 invisibility flag and unset the custom icon flag.
 .Pp
-# setfflags -i 1 -c 0 /path/to/file
+.Dl setfflags -i 1 -c 0 /path/to/file
 .Pp
-If you have any questions, please direct them to Sveinbjorn Thordarson <sveinbt@hi.is>.
-.Pp                    
-.Sh FILES                \" File used or created by the topic of the man page
+.Nm
+accepts the following options:
+.Bl -tag -width indent
+.It Fl h
+Print usage and exit.
+.It Fl m
+Silent mode.
+.It Fl p
+Print the file's current Finder flags.
+.It Fl v
+Print version and exit.
+.El
+.Sh FILES
 .Bl -tag -width "/usr/local/bin/setfflags" -compact
 .It Pa /usr/local/bin/setfflags
-.Sh SEE ALSO 
+.Sh AUTHOR
+Originally written by
+.An Sveinbjorn Thordarson Aq sveinbjornt@gmail.com .
+.Sh SEE ALSO
 .Xr SetFile 1 ,
-.Xr GetFileInfo 1 ,
-.Xr setfcomment 1 ,
-.Xr setsuffix 1 ,
 .Xr setlabel 1 ,
-.Xr seticon 1 ,
-.Xr lsmac 1
+.Xr setfcomment 1 ,
+.Xr setfctypes 1 ,
+.Xr finfo 1

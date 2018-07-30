@@ -1,68 +1,21 @@
 /*
-    hfsdata - print out Mac OS HFS+ meta-data for a file
-    Copyright (C) 2003-2005 Sveinbjorn Thordarson <sveinbt@hi.is>
+  hfsdata - print out Mac OS HFS+ meta-data for a file
+  Copyright (C) 2003-2005 Sveinbjorn Thordarson <sveinbt@hi.is>
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-/*  CHANGES
-    
-    0.1 - First release of hfsdata
-
-*/
-
-/*
-    Command line options
-
-    v - version
-    h - help - usage
-
-	//hfsdata flags
-
-	-x	tells whether file suffix is hidden			DONE
-	
-	-A	tells what application is used to open file	DONE
-	
-	-c	date created								DONE
-	-m	date modified								DONE
-	-a	date accessed								DONE
-	-t	date of attribute modification				DONE
-	
-	-r	Resource fork size, logical					DONE
-	-R	Resource fork size, physical				DONE
-	-s	Total size of both forks, logical			DONE
-	-S	Total size of both forks, physical			DONE
-	-d	Data fork size, logical						DONE
-	-D	Data fork size, physical					DONE
-	
-	-T	file type code								DONE
-	-C	creator type code							DONE
-	
-	-k	file kind, as it appears in the Finder		DONE
-	
-	-l	label, numerically							DONE
-	-L	label, by name								DONE
-	
-	-o	Mac OS X Finder comment						DONE
-	-O	Mac OS 9 Finder comment						DONE
-	
-	-e	Show file pointed to by alias				DONE
-    
-*/
-
 
 #define	kSuffixHidden				0
 #define	kAppForFile					1
@@ -85,8 +38,6 @@
 #define	kMacOS9Comment				18
 #define	kAliasOriginal				19
 
-/////////////// Includes /////////////////
-
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -94,85 +45,77 @@
 #include <Carbon/Carbon.h>
 #include <string.h>
 
-////////////// Prototypes ////////////////
+static OSErr PrintIsExtensionHidden (FSRef *fileRef);
+static OSErr PrintAliasSource (FSRef *fileRef);
+static OSErr PrintResourceForkLogicalSize (FSRef *fileRef);
+static OSErr PrintResourceForkPhysicalSize (FSRef *fileRef);
+static OSErr PrintDataForkLogicalSize (FSRef *fileRef);
+static OSErr PrintDataForkPhysicalSize (FSRef *fileRef);
+static OSErr PrintBothForksLogicalSize (FSRef *fileRef);
+static OSErr PrintBothForksPhysicalSize (FSRef *fileRef);
+static OSErr PrintDateCreated (FSRef *fileRef);
+static OSErr PrintDateContentModified (FSRef *fileRef);
+static OSErr PrintDateLastAccessed (FSRef *fileRef);
+static OSErr PrintDateAttributeModified (FSRef *fileRef);
+static OSErr PrintFileType (FSRef *fileRef);
+static OSErr PrintCreatorCode (FSRef *fileRef);
+static OSErr PrintKind (FSRef *fileRef);
+static OSErr PrintAppWhichOpensFile (FSRef *fileRef);
+static OSErr PrintLabelName (FSRef *fileRef);
+static OSErr PrintLabelNumber (FSRef *fileRef);
 
-	static OSErr PrintIsExtensionHidden (FSRef *fileRef);
-	static OSErr PrintAliasSource (FSRef *fileRef);
-	static OSErr PrintResourceForkLogicalSize (FSRef *fileRef);
-	static OSErr PrintResourceForkPhysicalSize (FSRef *fileRef);
-	static OSErr PrintDataForkLogicalSize (FSRef *fileRef);
-	static OSErr PrintDataForkPhysicalSize (FSRef *fileRef);
-	static OSErr PrintBothForksLogicalSize (FSRef *fileRef);
-	static OSErr PrintBothForksPhysicalSize (FSRef *fileRef);
-	static OSErr PrintDateCreated (FSRef *fileRef);
-	static OSErr PrintDateContentModified (FSRef *fileRef);
-	static OSErr PrintDateLastAccessed (FSRef *fileRef);
-	static OSErr PrintDateAttributeModified (FSRef *fileRef);
-	static OSErr PrintFileType (FSRef *fileRef);
-	static OSErr PrintCreatorCode (FSRef *fileRef);
-	static OSErr PrintKind (FSRef *fileRef);
-	static OSErr PrintAppWhichOpensFile (FSRef *fileRef);
-	static OSErr PrintLabelName (FSRef *fileRef);
-	static OSErr PrintLabelNumber (FSRef *fileRef);
-	
-	static void OSTypeToStr(OSType aType, char *aStr);
-	static int UnixIsFolder (char *path);
-	static Boolean IsFolder (FSRef *fileRef);
-	static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr);
-	static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
-	static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo);
-	static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo);
-	static short GetLabelNumber (short flags);
-	static OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString);
-	
-	static void PrintUsage (void);
-	static void PrintVersion (void);
-	static void PrintHelp (void);
-	
-	static OSErr PrintOSXComment (FSRef	*fileRef);
+static void OSTypeToStr(OSType aType, char *aStr);
+static int UnixIsFolder (char *path);
+static Boolean IsFolder (FSRef *fileRef);
+static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr);
+static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize);
+static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo);
+static OSErr FSGetFInfo(const FSRef* ref, FInfo *fInfo);
+static short GetLabelNumber (short flags);
+static OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTimeString);
+
+static void PrintUsage (void);
+static void PrintVersion (void);
+static void PrintHelp (void);
+
+static OSErr PrintOSXComment (FSRef	*fileRef);
 #if !__LP64__
-	static OSErr PrintOS9Comment (FSRef *fileRef);
+static OSErr PrintOS9Comment (FSRef *fileRef);
 #endif
-	//AE functions from MoreAppleEvents.c, Apple's sample code
-	pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
-	pascal void MoreAEDisposeDesc(AEDesc* desc);
-	pascal void MoreAENullDesc(AEDesc* desc);
-	pascal OSStatus MoreAEOCreateObjSpecifierFromFSRef(const FSRefPtr pFSRefPtr,AEDesc *pObjSpecifier);
-	pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,AEDesc *pObjSpecifier);
-	pascal OSStatus MoreAESendEventReturnAEDesc(const AEIdleUPP    pIdleProcUPP, const AppleEvent  *pAppleEvent,const DescType    pDescType, AEDesc        *pAEDesc);
-	pascal OSStatus MoreAESendEventReturnPString(const AEIdleUPP pIdleProcUPP,const AppleEvent* pAppleEvent,Str255 pStr255);
-	pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply);
-	pascal OSStatus MoreAESendEventReturnData(const AEIdleUPP    pIdleProcUPP,const AppleEvent  *pAppleEvent,DescType      pDesiredType,DescType*      pActualType,void*         pDataPtr,Size        pMaximumSize,Size         *pActualSize);
-	pascal OSErr MoreAEGetCFStringFromDescriptor(const AEDesc* pAEDesc, CFStringRef* pCFStringRef);
-	Boolean MyAEIdleCallback (EventRecord * theEvent,SInt32 * sleepTime,RgnHandle * mouseRgn);
 
+//AE functions from MoreAppleEvents.c, Apple's sample code
+pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr,Str255 pCommentStr,const AEIdleUPP pIdleProcUPP);
+pascal void MoreAEDisposeDesc(AEDesc* desc);
+pascal void MoreAENullDesc(AEDesc* desc);
+pascal OSStatus MoreAEOCreateObjSpecifierFromFSRef(const FSRefPtr pFSRefPtr,AEDesc *pObjSpecifier);
+pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,AEDesc *pObjSpecifier);
+pascal OSStatus MoreAESendEventReturnAEDesc(const AEIdleUPP    pIdleProcUPP, const AppleEvent  *pAppleEvent,const DescType    pDescType, AEDesc        *pAEDesc);
+pascal OSStatus MoreAESendEventReturnPString(const AEIdleUPP pIdleProcUPP,const AppleEvent* pAppleEvent,Str255 pStr255);
+pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply);
+pascal OSStatus MoreAESendEventReturnData(const AEIdleUPP    pIdleProcUPP,const AppleEvent  *pAppleEvent,DescType      pDesiredType,DescType*      pActualType,void*         pDataPtr,Size        pMaximumSize,Size         *pActualSize);
+pascal OSErr MoreAEGetCFStringFromDescriptor(const AEDesc* pAEDesc, CFStringRef* pCFStringRef);
+Boolean MyAEIdleCallback (EventRecord * theEvent,SInt32 * sleepTime,RgnHandle * mouseRgn);
 
 // Some MoreAppleEvents stuff I don't understand and don't want to
-            #define MoreAssert(x) (true)
-            #define MoreAssertQ(x)
-
-
-
-
-///////////////  Definitions    //////////////
+#define MoreAssert(x) (true)
+#define MoreAssertQ(x)
 
 #define		MAX_COMMENT_LENGTH	255
 #define		PROGRAM_STRING  	"hfsdata"
 #define		VERSION_STRING		"0.1"
 #define		AUTHOR_STRING 		"Sveinbjorn Thordarson"
 #if __LP64__
-#define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|e] file\nor\nhfsdata [-hv]\n"
+#define USAGE_STRING "hfsdata -AaCcDdehkLlmOoRrSsTtvx file\nor\nhfsdata [-hv]\n"
 #else
-#define     USAGE_STRING        "hfsdata [-x|A|c|m|a|t|r|R|s|S|d|D|T|C|k|l|L|o|O|e] file\nor\nhfsdata [-hv]\n"
+#define USAGE_STRING "hfsdata -AaCcDdehkLlmoRrSsTtvx file\nor\nhfsdata [-hv]\n"
 #endif
 
 // The Mac Four-Character Application Signature for the Finder
 static const OSType gFinderSignature = 'MACS';
 
-int main (int argc, const char * argv[]) 
+int main (int argc, const char * argv[])
 {
 	OSErr		err = noErr;
-    int			rc;
     int			optch;
 	char		*path;
 	FSRef		fileRef;
@@ -254,14 +197,13 @@ int main (int argc, const char * argv[])
 				type = kAliasOriginal;
 				break;
 			default: // '?'
-                rc = 1;
                 PrintUsage();
                 return 0;
         }
     }
-	
-	
-    
+
+
+
 	//path to file passed as argument
 	path = (char *)argv[optind];
 	if (path == NULL)
@@ -269,21 +211,21 @@ int main (int argc, const char * argv[])
 		PrintHelp();
 		exit(0);
 	}
-	
+
 	if (access(path, R_OK|F_OK) == -1)
 	{
 		perror(path);
 		exit(1);
 	}
-	
+
 	// Get file ref to the file or folder pointed to by the path
     err = FSPathMakeRef((unsigned char *)path, &fileRef, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSPathMakeRef(): Error %d returned when getting file reference for %s\n", err, path);
 		exit(1);
     }
-	
+
 	switch(type)
 	{
 		case kSuffixHidden:
@@ -349,7 +291,7 @@ int main (int argc, const char * argv[])
 			err = PrintAliasSource(&fileRef);
 			break;
 	}
-	
+
 	exit(err);
 
 	return err;
@@ -365,19 +307,19 @@ static OSErr PrintIsExtensionHidden (FSRef *fileRef)
 {
 	LSItemInfoRecord	infoRecord;
 	OSErr				err = noErr;
-	
+
 	err = LSCopyItemInfoForRef(fileRef, kLSRequestExtensionFlagsOnly, &infoRecord);
 	if (err)
-	{	
+	{
 		fprintf(stderr, "Error %d in LSCopyItemInfoForRef()\n", err);
 		return err;
 	}
-			
+
 	if (infoRecord.flags & kLSItemInfoExtensionIsHidden)
 		printf("Yes\n");
 	else
 		printf("No\n");
-	
+
 	return err;
 }
 
@@ -392,7 +334,7 @@ static OSErr PrintAliasSource (FSRef *fileRef)
     static char	srcPath[2048];
     Boolean	isAlias, isFolder;
 	FSRef	aliasRef;
-    
+
     //make sure we're dealing with an alias
     err = FSIsAliasFile (fileRef, &isAlias, &isFolder);
     if (err != noErr)
@@ -405,7 +347,7 @@ static OSErr PrintAliasSource (FSRef *fileRef)
         fprintf(stderr, "Argument is not an alias.\n");
         return TRUE;
     }
-    
+
     //resolve alias --> get file reference to file
     err = FSResolveAliasFile (fileRef, TRUE, &isFolder, &isAlias);
     if (err != noErr)
@@ -413,7 +355,7 @@ static OSErr PrintAliasSource (FSRef *fileRef)
         fprintf(stderr, "Error resolving alias.\n");
         return err;
     }
-    
+
     //get path to file that alias points to
     err = FSMakePath(*fileRef, (char *)&srcPath, strlen(srcPath));
     if (err != noErr)
@@ -436,14 +378,14 @@ static OSErr PrintResourceForkLogicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoRsrcSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.rsrcLogicalSize);
 	return err;
 }
@@ -453,14 +395,14 @@ static OSErr PrintResourceForkPhysicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoRsrcSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.rsrcPhysicalSize);
 	return err;
 }
@@ -471,14 +413,14 @@ static OSErr PrintDataForkLogicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoDataSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.dataLogicalSize);
 	return err;
 }
@@ -489,14 +431,14 @@ static OSErr PrintDataForkPhysicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoDataSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.dataPhysicalSize);
 	return err;
 }
@@ -506,14 +448,14 @@ static OSErr PrintBothForksLogicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoDataSizes+kFSCatInfoRsrcSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.rsrcLogicalSize + cinfo.dataLogicalSize);
 	return err;
 }
@@ -523,14 +465,14 @@ static OSErr PrintBothForksPhysicalSize (FSRef *fileRef)
 	OSErr				err = noErr;
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoDataSizes+kFSCatInfoRsrcSizes;
 	FSCatalogInfo		cinfo;
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	printf("%llu\n", cinfo.dataPhysicalSize + cinfo.rsrcPhysicalSize);
 	return err;
 }
@@ -543,14 +485,14 @@ static OSErr PrintDateCreated (FSRef *fileRef)
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoCreateDate;
 	FSCatalogInfo		cinfo;
 	char				dateCreatedString[255];
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	err = GetDateTimeStringFromUTCDateTime(&cinfo.createDate, (char *)&dateCreatedString);
 	if (err != noErr)
 	{
@@ -558,7 +500,7 @@ static OSErr PrintDateCreated (FSRef *fileRef)
         return err;
 	}
 	printf("%s\n", &dateCreatedString);
-	
+
 	return err;
 }
 
@@ -568,14 +510,14 @@ static OSErr PrintDateContentModified (FSRef *fileRef)
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoContentMod;
 	FSCatalogInfo		cinfo;
 	char				dateString[255];
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	err = GetDateTimeStringFromUTCDateTime(&cinfo.contentModDate, (char *)&dateString);
 	if (err != noErr)
 	{
@@ -583,7 +525,7 @@ static OSErr PrintDateContentModified (FSRef *fileRef)
         return err;
 	}
 	printf("%s\n", &dateString);
-	
+
 	return err;
 }
 
@@ -593,14 +535,14 @@ static OSErr PrintDateLastAccessed (FSRef *fileRef)
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoAccessDate;
 	FSCatalogInfo		cinfo;
 	char				dateString[255];
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	err = GetDateTimeStringFromUTCDateTime(&cinfo.accessDate, (char *)&dateString);
 	if (err != noErr)
 	{
@@ -608,7 +550,7 @@ static OSErr PrintDateLastAccessed (FSRef *fileRef)
         return err;
 	}
 	printf("%s\n", &dateString);
-	
+
 	return err;
 }
 
@@ -618,14 +560,14 @@ static OSErr PrintDateAttributeModified (FSRef *fileRef)
 	FSCatalogInfoBitmap cinfoMap = kFSCatInfoAttrMod;
 	FSCatalogInfo		cinfo;
 	char				dateString[255];
-	
+
 	err = FSGetCatalogInfo (fileRef, cinfoMap, &cinfo, NULL, NULL, NULL);
-	if (err != noErr) 
+	if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d returned when retrieving catalog information\n", err);
         return err;
     }
-	
+
 	err = GetDateTimeStringFromUTCDateTime(&cinfo.attributeModDate, (char *)&dateString);
 	if (err != noErr)
 	{
@@ -633,7 +575,7 @@ static OSErr PrintDateAttributeModified (FSRef *fileRef)
         return err;
 	}
 	printf("%s\n", &dateString);
-	
+
 	return err;
 }
 
@@ -655,7 +597,7 @@ static OSErr PrintFileType (FSRef *fileRef)
 
 	// retrieve filespec from file ref
     err = FSGetCatalogInfo (fileRef, NULL, NULL, NULL, &fileSpec, NULL);
-    if (err != noErr) 
+    if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from file reference\n", err);
         return err;
@@ -667,14 +609,14 @@ static OSErr PrintFileType (FSRef *fileRef)
 		fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
 		return err;
 	}
-	
+
 	/* get creator type string */
 	OSTypeToStr(finderInfo.fdType, fileType);
-	
+
 	//print it
 	if (strlen(fileType) != 0)
 		printf("%s\n", fileType);
-	
+
 	return 0;
 }
 
@@ -685,7 +627,7 @@ static OSErr PrintCreatorCode (FSRef *fileRef)
     FInfo 		finderInfo;
 	OSErr		err = noErr;
 	char		creatorType[5] = "\0";
-	
+
 	//if it's a folder
 	if (IsFolder(fileRef))
 	{
@@ -695,7 +637,7 @@ static OSErr PrintCreatorCode (FSRef *fileRef)
 
 	// retrieve filespec from file ref
     err = FSGetCatalogInfo (fileRef, NULL, NULL, NULL, &fileSpec, NULL);
-    if (err != noErr) 
+    if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from file reference\n", err);
         return err;
@@ -707,10 +649,10 @@ static OSErr PrintCreatorCode (FSRef *fileRef)
 		fprintf(stderr, "FSpGetFInfo(): Error %d getting file Finder File Info from file spec\n", err);
 		return err;
 	}
-	
+
 	/* get creator type string */
 	OSTypeToStr(finderInfo.fdCreator, creatorType);
-	
+
 	//print it
 	if (strlen(creatorType) != 0)
 		printf("%s\n", creatorType);
@@ -725,13 +667,13 @@ static OSErr PrintKind (FSRef *fileRef)
 	OSErr				err = noErr;
 	CFStringRef			kindString;
 	char				cKindStr[1024];
-	
+
 	err = LSCopyKindStringForRef(fileRef, &kindString);
 	if (err)
 		return err;
-	
+
 	CFStringGetCString(kindString, (char *)&cKindStr, 1024, CFStringGetSystemEncoding());
-	
+
 	printf("%s\n", cKindStr);
 	return 0;
 }
@@ -789,12 +731,12 @@ static OSErr PrintLabelName (FSRef *fileRef)
 
 	/* retrieve filespec from file ref */
     err = FSGetCatalogInfo (fileRef, NULL, NULL, NULL, &fileSpec, NULL);
-    if (err != noErr) 
+    if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from file reference\n", err);
         return err;
     }
-	
+
 	if (IsFolder(fileRef))
 	{
 		err = FSGetDInfo (fileRef, &dInfo);
@@ -815,9 +757,9 @@ static OSErr PrintLabelName (FSRef *fileRef)
 		}
 		labelNum = GetLabelNumber(finderInfo.fdFlags);
 	}
-	
+
 	printf("%s\n", (char *)&labelNames[labelNum]);
-	
+
 	return noErr;
 }
 
@@ -831,12 +773,12 @@ static OSErr PrintLabelNumber (FSRef *fileRef)
 
 	/* retrieve filespec from file ref */
     err = FSGetCatalogInfo (fileRef, NULL, NULL, NULL, &fileSpec, NULL);
-    if (err != noErr) 
+    if (err != noErr)
     {
         fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec from file reference\n", err);
         return err;
     }
-	
+
 	if (IsFolder(fileRef))
 	{
 		err = FSGetDInfo (fileRef, &dInfo);
@@ -857,9 +799,9 @@ static OSErr PrintLabelNumber (FSRef *fileRef)
 		}
 		labelNum = GetLabelNumber(finderInfo.fdFlags);
 	}
-	
+
 	printf("%d\n", labelNum);
-	
+
 	return noErr;
 }
 
@@ -888,7 +830,7 @@ static int UnixIsFolder (char *path)
 {
     struct stat filestat;
     short err;
-    
+
     err = stat(path, &filestat);
     if (err == -1)
         return err;
@@ -922,7 +864,7 @@ static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr)
     CFStringRef		cfStr;
 
     cfStr = CFStringCreateWithCharacters(kCFAllocatorDefault,uniStr->unicode,uniStr->length);
-    
+
     CFStringGetCString(cfStr, cstr, 255, kCFStringEncodingUTF8);
 }
 
@@ -932,14 +874,14 @@ static void HFSUniPStrToCString (HFSUniStr255 *uniStr, char *cstr)
 static OSStatus FSMakePath(FSRef fileRef, UInt8 *path, UInt32 maxPathSize)
 {
     OSStatus result;
- 
+
     result = FSRefMakePath(&fileRef, path, 2000);
 
     return ( result );
 }
 
 /*//////////////////////////////////////
-// Returns directory info structure of 
+// Returns directory info structure of
 // file spec
 /////////////////////////////////////*/
 static OSErr FSGetDInfo(const FSRef* ref, DInfo *dInfo)
@@ -979,19 +921,19 @@ static short GetLabelNumber (short flags)
         /* Is Yellow */
 	if (flags & 8 && flags & 2)
             return 3;
-        
+
         /* Is Blue */
 	if (flags & 8)
             return 5;
-        
+
         /* Is Purple */
 	if (flags & 2 && flags & 4)
             return 6;
-        
+
         /* Is Green */
 	if (flags & 4)
             return 4;
-        
+
         /* Is Gray */
 	if (flags & 2)
             return 7;
@@ -1004,7 +946,7 @@ OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTime
 {
 	CFAbsoluteTime  cfTime;
 	OSErr err = UCConvertUTCDateTimeToCFAbsoluteTime (utcDateTime, &cfTime);
-    
+
     CFLocaleRef locale = CFLocaleCopyCurrent();
     CFDateRef date = CFDateCreate(NULL, cfTime);
     CFDateFormatterRef formatter = CFDateFormatterCreate(NULL, locale,
@@ -1015,7 +957,7 @@ OSErr GetDateTimeStringFromUTCDateTime (UTCDateTime *utcDateTime, char *dateTime
     CFRelease(formatter);
     CFStringGetCString(dstr, dateTimeString, 256, kCFStringEncodingUTF8);
     CFRelease(dstr);
-	
+
 	return err;
 }
 
@@ -1077,7 +1019,7 @@ static void PrintHelp (void)
 	puts("\t-O  Prints the file's Mac OS 9 Desktop Database comment");
 #endif
 	puts("");
-	
+
 }
 
 #pragma mark -
@@ -1089,7 +1031,7 @@ static OSErr PrintOSXComment (FSRef	*fileRef)
 	Str255	comment = "\p";
 	char	cStrCmt[255] = "\0";
 	AEIdleUPP inIdleProc = NewAEIdleUPP(&MyAEIdleCallback);
-        
+
             //retrieve filespec from file ref
             err = FSGetCatalogInfo (fileRef, NULL, NULL, NULL, &fileSpec, NULL);
             if (err != noErr)
@@ -1097,7 +1039,7 @@ static OSErr PrintOSXComment (FSRef	*fileRef)
 				fprintf(stderr, "FSGetCatalogInfo(): Error %d getting file spec for %s\n", err);
                 return err;
             }
-    
+
     ///////////// oK, now we can go about getting the comment /////////////
 
 	// call the apple event routine. I'm not going to pretend I understand what's going on
@@ -1112,11 +1054,11 @@ static OSErr PrintOSXComment (FSRef	*fileRef)
 	}
 	//convert pascal string to c string
 	strncpy((char *)&cStrCmt, (unsigned char *)&comment+1, comment[0]);
-	
+
 	//if there is a comment, we print it
 	if (strlen((char *)&cStrCmt))
 		printf("%s\n", (char *)&cStrCmt);
-		
+
 	return noErr;
 }
 
@@ -1141,21 +1083,21 @@ static OSErr PrintOS9Comment (FSRef *fileRef)
     ///////////// oK, now we can go about getting the comment /////////////
 
 	dt.ioVRefNum = fileSpec.vRefNum;
-        
+
     err = PBDTGetPath(&dt);
 	if (err != noErr)
 	{
 		fprintf(stderr, "Can't get OS 9 comments\n");
 		return err;
 	}
-    
+
     //fill in the relevant fields (using parameters)
     dt.ioNamePtr = fileSpec.name;
     dt.ioDirID = fileSpec.parID;
     dt.ioDTBuffer = (char *)&buf;
-	
+
 	PBDTGetCommentSync(&dt);
-	
+
 	if (dt.ioDTActCount != 0) //if zero, that means no comment
 	{
 		strncpy((char *)&comment, (char *)&buf, dt.ioDTActCount);
@@ -1210,7 +1152,7 @@ pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr
         (void) MoreAEDisposeDesc(&tAEDesc);
 
     if (noErr == anErr)
-    {  
+    {
       //  Send the event.
       anErr = MoreAESendEventReturnPString(pIdleProcUPP,&tAppleEvent,pCommentStr);
 	  if (anErr)
@@ -1229,13 +1171,13 @@ pascal OSErr MoreFEGetComment(const FSRef *pFSRefPtr, const FSSpecPtr pFSSpecPtr
 }  // end MoreFEGetComment
 
 /********************************************************************************
-  Send an Apple event to the Finder to get the finder comment of the item 
+  Send an Apple event to the Finder to get the finder comment of the item
   specified by the FSRefPtr.
 
   pFSRefPtr    ==>    The item to get the file kind of.
   pCommentStr    ==>    A string into which the finder comment will be returned.
   pIdleProcUPP  ==>    A UPP for an idle function (required)
-  
+
   See note about idle functions above.
 */
 #if TARGET_API_MAC_CARBON
@@ -1266,7 +1208,7 @@ pascal OSErr MoreFEGetCommentCFString(const FSRefPtr pFSRefPtr, CFStringRef* pCo
         (void) MoreAEDisposeDesc(&tAEDesc);
 
     if (noErr == anErr)
-    {  
+    {
 #if 0  // Set this true to printf the Apple Event before you send it.
       Handle strHdl;
       anErr = AEPrintDescToHandle(&tAppleEvent,&strHdl);
@@ -1302,7 +1244,7 @@ pascal void MoreAEDisposeDesc(AEDesc* desc)
 	OSStatus junk;
 
 	MoreAssertQ(desc != nil);
-	
+
 	junk = AEDisposeDesc(desc);
 	MoreAssertQ(junk == noErr);
 
@@ -1368,11 +1310,11 @@ pascal OSStatus MoreAEOCreateObjSpecifierFromCFURLRef(const CFURLRef pCFURLRef,A
 			if ((anErr = MemError()) == noErr)
 			{
 				CFStringGetCharacters(tCFStringRef, CFRangeMake(0,bufSize/2), buf);
-				if (isDirectory) (buf)[(bufSize-1)/2] = (UniChar) 0x003A;				
+				if (isDirectory) (buf)[(bufSize-1)/2] = (UniChar) 0x003A;
 			}
 		} else
 			anErr = coreFoundationUnknownErr;
-		
+
 		if (anErr == noErr)
 			anErr = AECreateDesc(typeUnicodeText, buf, GetPtrSize((Ptr) buf), &nameDesc);
 		if (anErr == noErr)
@@ -1447,17 +1389,17 @@ pascal  OSStatus  MoreAEGetHandlerError(const AppleEvent* pAEReply)
 {
   OSStatus  anError = noErr;
   OSErr    handlerErr;
-  
+
   DescType  actualType;
   long    actualSize;
-  
+
   if ( pAEReply->descriptorType != typeNull )  // there's a reply, so there may be an error
   {
     OSErr  getErrErr = noErr;
-    
+
     getErrErr = AEGetParamPtr( pAEReply, keyErrorNumber, typeSInt16, &actualType,
                   &handlerErr, sizeof( OSErr ), &actualSize );
-    
+
     if ( getErrErr != errAEDescNotFound )  // found an errorNumber parameter
     {
       anError = handlerErr;          // so return it's value

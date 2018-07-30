@@ -1,14 +1,13 @@
-.\"/usr/share/misc/mdoc.template
-.Dd Fri Apr 18 2003
+.Dd April 9, 2015
 .Dt mkalias 1
 .Os Darwin
 .Sh NAME
 .Nm mkalias
-.Nd Create MacOS Finder aliases
+.Nd create MacOS Finder aliases
 .Sh SYNOPSIS
 .Nm
-.Op Fl vhctr
-.Op Ar source-file 
+.Op Fl chrtv
+.Op Ar source-file
 .Op Ar target-alias
 .Sh DESCRIPTION
 .Ar mkalias
@@ -19,28 +18,24 @@ aliases created manually using the Finder.  The alias gets the source file's cus
 File and Creator type, and has the kIsAlias and kHasCustomIcon Finder flags set.
 .Pp
 The following options are accepted:
-.Bl -tag -width -indent
-.It Fl r
-Make the alias relative instead of absolute.  See http://developer.apple.com/technotes/tn/tn1188.html for why this is useful
+.Bl -tag -width indent
 .It Fl c
-Omit copying source file's icon to target alias
+Do not copy source file's icon to target alias.
+.It Fl h
+Print usage and exit.
+.It Fl r
+Make the alias relative instead of absolute.
 .It Fl t
 Source file's type and creator are not applied to the alias
 .It Fl v
-Print version and author
-.It Fl h
-Print help
+Print version and exit.
 .El
-.Pp         
 .Sh FILES
 .Bl -tag -width "/usr/local/bin/mkalias" -compact
 .It Pa /usr/local/bin/mkalias
 .El
-.Sh SEE ALSO 
-.Xr ln 1 , 
-.Xr lsmac 1 ,
-.Xr setfctypes 1 ,
-.Xr setfflags 1 ,
-.Xr cpath 1 ,
-.Xr setsuffix 1 ,
-.Xr setfcomment 1 ,
+.Sh AUTHOR
+Originally written by
+.An Sveinbjorn Thordarson Aq sveinbjornt@gmail.com .
+.Sh SEE ALSO
+.Xr ln 1
