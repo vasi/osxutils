@@ -1,7 +1,8 @@
 osxutils is a bundle of Mac OS X command line utilities that bring power over all sorts of Mac-specific information, settings and meta-data to the command line.
 
-Documentation: http://sveinbjorn.org/osxutils_docs
-SourceForge: http://sourceforge.net/projects/osxutils/
+Formerly found at (broken links):
+* Documentation: http://sveinbjorn.org/osxutils_docs
+* SourceForge: http://sourceforge.net/projects/osxutils/
 
 
 osxutils is written by Sveinbjorn Thordarson. I have updated it to work on 64-bit systems and modern versions of Mac OS X. Change notes:
