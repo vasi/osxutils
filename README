@@ -4,6 +4,7 @@ Formerly found at (broken links):
 * Documentation: http://sveinbjorn.org/osxutils_docs
 * SourceForge: http://sourceforge.net/projects/osxutils/
 
+Active development here has ceased. There's a newer, supported fork [here](https://github.com/specious/osxutils) which you may prefer to use.
 
 osxutils is written by Sveinbjorn Thordarson. I have updated it to work on 64-bit systems and modern versions of Mac OS X. Change notes:
 
